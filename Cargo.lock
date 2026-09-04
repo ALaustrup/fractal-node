@@ -345,6 +345,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "fractal-schema"
+version = "0.0.1"
+
+[[package]]
 name = "fractal-testkit"
 version = "0.0.1"
 dependencies = [
@@ -1142,6 +1146,7 @@ name = "xtask"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "fractal-schema",
  "serde",
  "serde_json",
  "toml",

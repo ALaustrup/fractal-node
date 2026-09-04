@@ -1,0 +1,768 @@
+{
+  "components": {
+    "schemas": {
+      "CreateSocietyRequest": {
+        "additionalProperties": false,
+        "description": "Found a Society.",
+        "properties": {
+          "founder_fnid": {
+            "description": "PH0 only. From PH1 the actor comes from the session (`docs/12`).",
+            "type": "string"
+          },
+          "founder_level": {
+            "description": "PH0 only. Founding a second Society requires Level 3.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "handle": {
+            "description": "3–24 characters of a–z, 0–9, underscore.",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "description": "Makes the command safe to retry for 24 hours (`docs/10 §10`).",
+            "type": "string"
+          },
+          "name": {
+            "description": "Display name, 1–64 characters.",
+            "type": "string"
+          },
+          "societies_founded": {
+            "description": "PH0 only. How many this Citizen has already founded; the first-hearth rule reads it.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "visibility": {
+            "description": "Defaults to discoverable.",
+            "enum": [
+              "public",
+              "discoverable",
+              "private",
+              "sealed"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "handle"
+        ],
+        "type": "object"
+      },
+      "Error": {
+        "description": "Cause, then remedy, no apology (docs/33 §7.3).",
+        "properties": {
+          "code": {
+            "enum": [
+              "usage",
+              "invalid_identifier",
+              "invalid_handle",
+              "invalid_fnid",
+              "unauthenticated",
+              "capability_denied",
+              "confirmation_required",
+              "not_found",
+              "conflict",
+              "rejected",
+              "rate_limited",
+              "store_unavailable",
+              "unreachable",
+              "internal"
+            ],
+            "type": "string"
+          },
+          "detail": {
+            "description": "What happened, specifically.",
+            "type": "string"
+          },
+          "docs": {
+            "format": "uri",
+            "type": "string"
+          },
+          "remedy": {
+            "description": "What to do about it.",
+            "properties": {
+              "human": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "retryable": {
+            "type": "boolean"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "title",
+          "detail",
+          "retryable"
+        ],
+        "type": "object"
+      },
+      "Health": {
+        "additionalProperties": false,
+        "description": "Liveness and version of a Node.",
+        "properties": {
+          "api_version": {
+            "description": "API major version.",
+            "type": "string"
+          },
+          "runtime": {
+            "description": "Runtime version.",
+            "type": "string"
+          },
+          "status": {
+            "description": "Whether the Runtime considers itself healthy.",
+            "enum": [
+              "ok",
+              "degraded"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "runtime",
+          "api_version"
+        ],
+        "type": "object"
+      },
+      "Meta": {
+        "additionalProperties": false,
+        "description": "The machine-readable description of this Node's surface (`docs/31 §8`).",
+        "properties": {
+          "api_version": {
+            "description": "API major version.",
+            "type": "string"
+          },
+          "operations": {
+            "description": "Every operation, generated from the schema. An agent plans against this rather than probing.",
+            "type": "string"
+          },
+          "phase": {
+            "description": "The phase this build implements.",
+            "type": "string"
+          },
+          "runtime": {
+            "description": "Runtime version.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "runtime",
+          "api_version",
+          "phase",
+          "operations"
+        ],
+        "type": "object"
+      },
+      "Society": {
+        "additionalProperties": false,
+        "description": "A Society — the atomic container (P1).",
+        "properties": {
+          "created_at": {
+            "description": "When it was founded.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "founder": {
+            "description": "FNID of the founding Citizen.",
+            "type": "string"
+          },
+          "handle": {
+            "description": "Globally unique, `@name`.",
+            "type": "string"
+          },
+          "member_count": {
+            "description": "Members. Never below 1 while Active.",
+            "format": "int64",
+            "type": "integer"
+          },
+          "name": {
+            "description": "Display name, 1–64 characters.",
+            "type": "string"
+          },
+          "seq": {
+            "description": "Position in THIS Society's log. Per-Society, never global (`docs/10 §4`).",
+            "format": "int64",
+            "type": "integer"
+          },
+          "society_id": {
+            "description": "`soc_` + ULID.",
+            "type": "string"
+          },
+          "status": {
+            "description": "Lifecycle state (`docs/11 §4`).",
+            "enum": [
+              "forming",
+              "active",
+              "dormant",
+              "fracturing",
+              "dissolving",
+              "archived"
+            ],
+            "type": "string"
+          },
+          "visibility": {
+            "description": "Who may see and join it.",
+            "enum": [
+              "public",
+              "discoverable",
+              "private",
+              "sealed"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "society_id",
+          "name",
+          "handle",
+          "founder",
+          "visibility",
+          "status",
+          "member_count",
+          "created_at",
+          "seq"
+        ],
+        "type": "object"
+      },
+      "SocietyCreatedPayload": {
+        "additionalProperties": false,
+        "description": "Payload of `society.created.v1`.",
+        "properties": {
+          "founder": {
+            "description": "FNID of the founding Citizen.",
+            "type": "string"
+          },
+          "handle": {
+            "description": "Handle as claimed.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Display name as founded.",
+            "type": "string"
+          },
+          "origin": {
+            "description": "How this Society came to exist (`docs/11 §2.2` Lineage).",
+            "enum": [
+              "first_hearth",
+              "founded",
+              "crystallized",
+              "fractured",
+              "forked"
+            ],
+            "type": "string"
+          },
+          "society_id": {
+            "description": "`soc_` + ULID.",
+            "type": "string"
+          },
+          "status": {
+            "description": "A Society is Active from its first event: it has one member, its founder.",
+            "enum": [
+              "active"
+            ],
+            "type": "string"
+          },
+          "visibility": {
+            "description": "Visibility at founding.",
+            "enum": [
+              "public",
+              "discoverable",
+              "private",
+              "sealed"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "society_id",
+          "name",
+          "handle",
+          "founder",
+          "visibility",
+          "status",
+          "origin"
+        ],
+        "type": "object"
+      },
+      "SocietyEnvelope": {
+        "additionalProperties": false,
+        "description": "A single Society.",
+        "properties": {
+          "society": {
+            "$ref": "#/components/schemas/Society",
+            "description": "The Society."
+          }
+        },
+        "required": [
+          "society"
+        ],
+        "type": "object"
+      },
+      "SocietyList": {
+        "additionalProperties": false,
+        "description": "Every Society on this Node.",
+        "properties": {
+          "societies": {
+            "description": "Ordered by creation time.",
+            "items": {
+              "$ref": "#/components/schemas/Society"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "societies"
+        ],
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "GENERATED by `cargo xtask codegen` from crates/support/schema.\nDo not edit: your change will be overwritten and CI will fail on the diff.",
+    "title": "Fractal Node",
+    "version": "v1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "node.status",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Health"
+                    },
+                    "meta": {
+                      "type": "object"
+                    },
+                    "ok": {
+                      "const": true
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Liveness and version of this Node."
+          }
+        },
+        "summary": "Liveness and version of this Node.",
+        "x-fractal-cli": "fn node status",
+        "x-fractal-dry-runnable": false,
+        "x-fractal-idempotent": true
+      }
+    },
+    "/v1/meta": {
+      "get": {
+        "operationId": "node.meta",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Meta"
+                    },
+                    "meta": {
+                      "type": "object"
+                    },
+                    "ok": {
+                      "const": true
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The machine-readable description of this Node's surface."
+          }
+        },
+        "summary": "The machine-readable description of this Node's surface.",
+        "x-fractal-cli": "fn node meta",
+        "x-fractal-dry-runnable": false,
+        "x-fractal-idempotent": true
+      }
+    },
+    "/v1/societies": {
+      "get": {
+        "operationId": "society.list",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SocietyList"
+                    },
+                    "meta": {
+                      "type": "object"
+                    },
+                    "ok": {
+                      "const": true
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Every Society this Node holds."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/Error"
+                    },
+                    "ok": {
+                      "const": false
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The event log could not be read or written."
+          }
+        },
+        "summary": "Every Society this Node holds.",
+        "x-fractal-capability": "society.read",
+        "x-fractal-cli": "fn society list",
+        "x-fractal-dry-runnable": false,
+        "x-fractal-idempotent": true
+      },
+      "post": {
+        "operationId": "society.create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSocietyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SocietyEnvelope"
+                    },
+                    "meta": {
+                      "type": "object"
+                    },
+                    "ok": {
+                      "const": true
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Found a Society."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/Error"
+                    },
+                    "ok": {
+                      "const": false
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A Handle was the wrong length or shape."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/Error"
+                    },
+                    "ok": {
+                      "const": false
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The principal's Envelope does not permit this. Names the missing capability."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/Error"
+                    },
+                    "ok": {
+                      "const": false
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Optimistic concurrency lost. Reload and retry."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/Error"
+                    },
+                    "ok": {
+                      "const": false
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The domain refused the command. The detail says why."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/Error"
+                    },
+                    "ok": {
+                      "const": false
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The event log could not be read or written."
+          }
+        },
+        "summary": "Found a Society.",
+        "x-fractal-capability": "society.create",
+        "x-fractal-cli": "fn society create",
+        "x-fractal-dry-runnable": true,
+        "x-fractal-idempotent": true
+      }
+    },
+    "/v1/societies/{society_id}": {
+      "get": {
+        "operationId": "society.get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "society_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SocietyEnvelope"
+                    },
+                    "meta": {
+                      "type": "object"
+                    },
+                    "ok": {
+                      "const": true
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Read one Society."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/Error"
+                    },
+                    "ok": {
+                      "const": false
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "An identifier did not parse or failed its checksum."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/Error"
+                    },
+                    "ok": {
+                      "const": false
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such object on this Node."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/Error"
+                    },
+                    "ok": {
+                      "const": false
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The event log could not be read or written."
+          }
+        },
+        "summary": "Read one Society.",
+        "x-fractal-capability": "society.read",
+        "x-fractal-cli": "fn society get",
+        "x-fractal-dry-runnable": false,
+        "x-fractal-idempotent": true
+      }
+    }
+  }
+}

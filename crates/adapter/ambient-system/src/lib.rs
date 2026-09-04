@@ -72,12 +72,30 @@ mod tests {
     }
 
     #[test]
-    fn ids_are_unique_and_ordered() {
+    fn ids_are_unique() {
+        // 1,000 in a tight loop: most land in the same millisecond, so this is
+        // exercising the random component rather than the clock.
+        let g = SystemIdGen;
+        let ids: std::collections::BTreeSet<_> = (0..1_000).map(|_| g.next_ulid()).collect();
+        assert_eq!(
+            ids.len(),
+            1_000,
+            "an IdGen that repeats itself corrupts the log"
+        );
+    }
+
+    #[test]
+    fn ids_are_ordered_across_a_millisecond() {
+        // ULIDs are time-ordered to the millisecond and random below it, so two
+        // minted in the same millisecond have NO defined order. Asserting `a < b`
+        // on consecutive ids is a coin flip — it passes locally and fails in CI,
+        // which is worse than not testing at all. The guarantee is this one.
         let g = SystemIdGen;
         let a = g.next_ulid();
+        std::thread::sleep(std::time::Duration::from_millis(2));
         let b = g.next_ulid();
-        assert_ne!(a, b);
-        assert!(a < b);
+        assert!(a < b, "ids must be ordered once the clock has moved");
+        assert!(a.timestamp_ms() < b.timestamp_ms());
     }
 
     #[test]

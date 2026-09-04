@@ -72,12 +72,20 @@ async fn main() -> anyhow::Result<()> {
     if let Some(dir) = &args.web_dir {
         // The GUI is a peer front end over the same public API (P3/P13), not a
         // privileged surface. It is served here purely so PH0 has one origin.
-        let tokens = dir
-            .join("..")
-            .join("..")
-            .join("packages/tokens/dist/tokens.css");
+        //
+        // Both files below are GENERATED — the design tokens from
+        // packages/tokens, the API client from crates/support/schema. The web
+        // app hand-writes neither a colour nor a fetch call.
+        let pkgs = dir.join("..").join("..").join("packages");
         app = app
-            .route_service("/tokens.css", tower_http::services::ServeFile::new(tokens))
+            .route_service(
+                "/tokens.css",
+                tower_http::services::ServeFile::new(pkgs.join("tokens/dist/tokens.css")),
+            )
+            .route_service(
+                "/api-client.js",
+                tower_http::services::ServeFile::new(pkgs.join("api-client/dist/index.js")),
+            )
             .fallback_service(tower_http::services::ServeDir::new(dir));
     }
 

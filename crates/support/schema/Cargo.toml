@@ -1,0 +1,12 @@
+[package]
+name = "fractal-schema"
+description = "THE contract. Every API surface, CLI command and event shape is declared here and generated from here (docs/30, docs/41 §12)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+
+[lints]
+workspace = true

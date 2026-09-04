@@ -77,18 +77,10 @@ pub(crate) fn fail(
     exit
 }
 
-/// The closed exit-code set. Scripts depend on these, so they never change.
+/// The closed exit-code set, from the contract (`crates/support/schema`).
+///
+/// Scripts depend on these, so they are generated rather than typed twice.
 #[must_use]
-pub(crate) const fn exit_code_for(code: &str) -> i32 {
-    match code.as_bytes() {
-        b"usage" | b"invalid_identifier" | b"invalid_handle" | b"invalid_fnid" => 2,
-        b"unauthenticated" => 3,
-        b"capability_denied" | b"confirmation_required" => 4,
-        b"not_found" => 5,
-        b"conflict" => 6,
-        b"rate_limited" => 7,
-        b"unreachable" | b"store_unavailable" => 8,
-        b"dry_run_blocked" => 10,
-        _ => 1,
-    }
+pub(crate) fn exit_code_for(code: &str) -> i32 {
+    crate::generated::exit_code_for(code)
 }

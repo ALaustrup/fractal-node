@@ -8,6 +8,8 @@
 //! "Something went wrong" is a banned string, and there is no code path here
 //! that could produce one.
 
+mod generated;
+
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
@@ -60,7 +62,6 @@ fn ok_body(data: &serde_json::Value) -> serde_json::Value {
 }
 
 struct ApiError {
-    status: StatusCode,
     code: &'static str,
     title: String,
     detail: String,
@@ -68,8 +69,23 @@ struct ApiError {
     retryable: bool,
 }
 
+impl ApiError {
+    /// The HTTP status for this error code, read from the generated registry.
+    ///
+    /// Stating it here as well as in the contract would be two places to change
+    /// and one place to forget.
+    fn status(&self) -> StatusCode {
+        generated::ERROR_STATUS
+            .iter()
+            .find(|(code, _)| *code == self.code)
+            .and_then(|(_, http)| StatusCode::from_u16(*http).ok())
+            .unwrap_or(StatusCode::INTERNAL_SERVER_ERROR)
+    }
+}
+
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
+        let status = self.status();
         let body = serde_json::json!({
             "ok": false,
             "error": {
@@ -82,7 +98,7 @@ impl IntoResponse for ApiError {
             },
             "meta": { "api_version": API_VERSION },
         });
-        (self.status, Json(body)).into_response()
+        (status, Json(body)).into_response()
     }
 }
 
@@ -92,7 +108,6 @@ impl From<ServiceError> for ApiError {
             // Every denial shape is mapped explicitly. The compiler enforces
             // this: a new PolicyDenied variant cannot ship with a vague message.
             ServiceError::Denied(PolicyDenied::NotHuman { .. }) => Self {
-                status: StatusCode::FORBIDDEN,
                 code: "capability_denied",
                 title: "Refused".to_owned(),
                 detail: e.to_string(),
@@ -104,7 +119,6 @@ impl From<ServiceError> for ApiError {
                 retryable: false,
             },
             ServiceError::Denied(PolicyDenied::CapabilityDenied { ref capability }) => Self {
-                status: StatusCode::FORBIDDEN,
                 code: "capability_denied",
                 title: "Refused".to_owned(),
                 detail: e.to_string(),
@@ -114,7 +128,6 @@ impl From<ServiceError> for ApiError {
                 retryable: false,
             },
             ServiceError::Denied(PolicyDenied::ConfirmationRequired { .. }) => Self {
-                status: StatusCode::FORBIDDEN,
                 code: "confirmation_required",
                 title: "Confirmation needed".to_owned(),
                 detail: e.to_string(),
@@ -126,7 +139,6 @@ impl From<ServiceError> for ApiError {
                 retryable: false,
             },
             ServiceError::Rejected(ref r) => Self {
-                status: StatusCode::UNPROCESSABLE_ENTITY,
                 code: "rejected",
                 title: "Refused".to_owned(),
                 detail: r.to_string(),
@@ -134,7 +146,6 @@ impl From<ServiceError> for ApiError {
                 retryable: false,
             },
             ServiceError::Append(_) => Self {
-                status: StatusCode::CONFLICT,
                 code: "conflict",
                 title: "Conflict".to_owned(),
                 detail: e.to_string(),
@@ -142,7 +153,6 @@ impl From<ServiceError> for ApiError {
                 retryable: true,
             },
             ServiceError::Read { .. } | ServiceError::Corrupt { .. } => Self {
-                status: StatusCode::INTERNAL_SERVER_ERROR,
                 code: "store_unavailable",
                 title: "The log could not be read".to_owned(),
                 detail: e.to_string(),
@@ -155,7 +165,6 @@ impl From<ServiceError> for ApiError {
 
 fn bad_request(code: &'static str, detail: String, remedy: &str) -> ApiError {
     ApiError {
-        status: StatusCode::BAD_REQUEST,
         code,
         title: "Refused".to_owned(),
         detail,
@@ -177,19 +186,29 @@ async fn health(State(s): State<AppState>) -> Json<serde_json::Value> {
 }
 
 async fn meta(State(s): State<AppState>) -> Json<serde_json::Value> {
-    // Machine-readable surface description. `docs/31 §8`: an agent discovers the
-    // shape of the system rather than scraping help text.
+    // GENERATED from the contract (crates/support/schema). An agent planning
+    // against this is planning against the same table the CLI is built from,
+    // which is why the two cannot drift (`docs/31 §8`, P13).
+    let operations: Vec<_> = generated::OPERATIONS
+        .iter()
+        .map(|op| {
+            serde_json::json!({
+                "id": op.id,
+                "method": op.method,
+                "path": op.path,
+                "cli": op.cli,
+                "summary": op.summary,
+                "idempotent": op.idempotent,
+                "dry_runnable": op.dry_runnable,
+            })
+        })
+        .collect();
     Json(ok_body(&serde_json::json!({
         "runtime": s.runtime_version,
         "api_version": API_VERSION,
         "cli_min_version": CLI_MIN_VERSION,
         "phase": "PH0",
-        "operations": [
-            { "id": "node.status",    "method": "GET",  "path": "/health",                    "cli": "fn status" },
-            { "id": "society.list",   "method": "GET",  "path": "/v1/societies",              "cli": "fn society list" },
-            { "id": "society.create", "method": "POST", "path": "/v1/societies",              "cli": "fn society create" },
-            { "id": "society.get",    "method": "GET",  "path": "/v1/societies/{society_id}", "cli": "fn society get" }
-        ]
+        "operations": operations,
     })))
 }
 
@@ -212,7 +231,6 @@ async fn get_society(
     match s.societies.get(id)? {
         Some(v) => Ok(Json(ok_body(&serde_json::json!({ "society": v })))),
         None => Err(ApiError {
-            status: StatusCode::NOT_FOUND,
             code: "not_found",
             title: "No such Society".to_owned(),
             detail: format!("{id} is not on this Node."),

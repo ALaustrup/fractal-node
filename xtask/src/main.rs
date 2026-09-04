@@ -6,6 +6,7 @@
 
 #![allow(clippy::print_stdout, clippy::print_stderr)]
 
+mod codegen;
 mod lint_deps;
 mod parity;
 mod tokens;
@@ -18,6 +19,7 @@ fn main() -> Result<()> {
     let check = args.iter().any(|a| a == "--check");
 
     match cmd {
+        "codegen" => codegen::run(check),
         "lint-deps" => lint_deps::run(),
         "tokens" => tokens::run(check),
         "parity" => parity::run(),
@@ -36,6 +38,7 @@ fn main() -> Result<()> {
 fn print_help() {
     println!("cargo xtask <task>");
     println!();
+    println!("  codegen [--check] Generate every surface from crates/support/schema; --check fails on drift");
     println!("  lint-deps        Enforce layers.toml: dependency direction and vendor bans (P5)");
     println!("  tokens [--check] Generate the design tokens for every target; --check fails on drift (N7)");
     println!("  parity           Every API operation must have a CLI command (P13)");
@@ -60,6 +63,7 @@ fn verify() -> Result<()> {
     step("test", &["test", "--workspace"])?;
     println!("\n== canon ==");
     lint_deps::run()?;
+    codegen::run(true)?;
     tokens::run(true)?;
     parity::run()?;
     println!("\n\u{1b}[38;2;140;232;223m⌁\u{1b}[0m verify: all gates green");

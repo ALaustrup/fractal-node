@@ -9,6 +9,7 @@
 
 #![allow(clippy::print_stdout, clippy::print_stderr)] // A CLI's output IS its interface.
 
+mod generated;
 mod http;
 mod render;
 mod theme;
@@ -50,13 +51,24 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Command {
-    /// Node and identity status.
-    Status,
-    /// The machine-readable command tree (`docs/31 §8`).
-    Schema,
+    /// This Node.
+    #[command(subcommand)]
+    Node(NodeCmd),
     /// Societies — the atomic container.
     #[command(subcommand)]
     Society(SocietyCmd),
+    /// `fn status` — a shorthand for `fn node status`, because it is typed constantly.
+    Status,
+    /// The machine-readable command tree (`docs/31 §8`).
+    Schema,
+}
+
+#[derive(Subcommand, Debug)]
+enum NodeCmd {
+    /// Liveness and version of this Node.
+    Status,
+    /// The machine-readable description of this Node's surface.
+    Meta,
 }
 
 #[derive(Subcommand, Debug)]
@@ -97,27 +109,37 @@ fn run(cli: &Cli, format: Format) -> i32 {
             boot(&cli.node, format);
             0
         }
-        Some(Command::Status) => status(&cli.node, format),
+        Some(Command::Status | Command::Node(NodeCmd::Status)) => status(&cli.node, format),
+        Some(Command::Node(NodeCmd::Meta)) => node_meta(&cli.node, format),
         Some(Command::Schema) => {
-            // Discoverability for agents: the whole surface, without scraping help.
+            // GENERATED from the contract. `docs/31 §8`: an agent discovers the
+            // whole surface here rather than scraping help text — and because
+            // this table and the gateway's are emitted from the same source,
+            // what it discovers is guaranteed to exist.
+            let commands: Vec<_> = generated::COMMANDS
+                .iter()
+                .map(|c| {
+                    serde_json::json!({
+                        "operation": c.id,
+                        "path": [c.noun, c.verb],
+                        "args": c.args,
+                        "flags": c.flags,
+                        "summary": c.summary,
+                        "method": c.method,
+                        "http_path": c.path,
+                        "dry_runnable": c.dry_runnable,
+                    })
+                })
+                .collect();
+            let exits: serde_json::Map<String, serde_json::Value> = generated::EXIT_CODES
+                .iter()
+                .map(|(code, exit)| ((*code).to_owned(), serde_json::json!(exit)))
+                .collect();
             let tree = serde_json::json!({
                 "cli_version": VERSION,
-                "commands": [
-                    { "path": ["status"], "operation": "node.status" },
-                    { "path": ["schema"], "operation": "cli.schema" },
-                    { "path": ["society", "list"],   "operation": "society.list" },
-                    { "path": ["society", "create"], "operation": "society.create",
-                      "args": ["name"], "flags": ["handle", "visibility", "idempotency-key"] },
-                    { "path": ["society", "get"],    "operation": "society.get", "args": ["society_id"] }
-                ],
+                "commands": commands,
                 "global_flags": ["format", "node", "dry-run"],
-                "exit_codes": {
-                    "0": "success", "1": "generic failure", "2": "usage",
-                    "3": "authentication required", "4": "capability denied",
-                    "5": "not found", "6": "conflict", "7": "rate limited",
-                    "8": "node unreachable", "9": "confirmation required",
-                    "10": "dry run reported blocking violations", "70": "internal error"
-                }
+                "exit_codes": exits,
             });
             render::ok(format, &tree, || println!("{tree:#}"));
             0
@@ -190,6 +212,37 @@ fn line(index: &str, detail: &str, state: &str, good: bool) {
         theme::muted(detail),
         painted
     );
+}
+
+fn node_meta(node: &str, format: Format) -> i32 {
+    match call(node, "GET", "/v1/meta", None, format) {
+        Ok(data) => {
+            render::ok(format, &data, || {
+                let empty = Vec::new();
+                let ops = data
+                    .get("operations")
+                    .and_then(|v| v.as_array())
+                    .unwrap_or(&empty);
+                println!(
+                    "{}",
+                    theme::dim("  OPERATION            METHOD  PATH                          CLI")
+                );
+                for o in ops {
+                    let g = |k: &str| o.get(k).and_then(|v| v.as_str()).unwrap_or("").to_owned();
+                    println!(
+                        "{} {:<20} {:<7} {:<29} {}",
+                        theme::rail(false),
+                        theme::signal(&g("id")),
+                        theme::muted(&g("method")),
+                        theme::dim(&g("path")),
+                        theme::muted(&g("cli"))
+                    );
+                }
+            });
+            0
+        }
+        Err(code) => code,
+    }
 }
 
 fn status(node: &str, format: Format) -> i32 {

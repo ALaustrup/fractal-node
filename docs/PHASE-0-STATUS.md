@@ -9,9 +9,9 @@
 |---|---|---|---|
 | 1 | `cargo xtask verify` passes cold on Linux, macOS, Windows | **Partial** | Green on Linux. macOS and Windows unverified — no runner has executed yet. |
 | 2 | Core compiles to x86_64, aarch64, wasm32 | **Partial** | x86_64 and wasm32 verified locally. aarch64 is in CI but has not run. |
-| 3 | Regenerating from `fractal-schema` produces a zero diff | **Not met** | M0.4 not built. See below. |
+| 3 | Regenerating from `fractal-schema` produces a zero diff | **Met** | `cargo xtask codegen --check`: 6 artefacts, 0 drift. |
 | 4 | Regenerating tokens produces a zero diff across five targets | **Met** | `cargo xtask tokens --check` |
-| 5 | Creating a Society via web, CLI and API produces identical event streams | **Partial** | Verified by hand — all three emit `society.created.v1` with identical shape. Not yet a test. |
+| 5 | Creating a Society via web, CLI and API produces identical event streams | **Partial** | Verified by hand, and all three now share one generated client/table. Still not a test. |
 | 6 | Simulation runs 2,000 seeded histories asserting three invariants | **Not met** | Fakes exist; the runner does not. |
 | 7 | Fast-lane CI completes under 5 minutes | **Unverified** | Workflow written; no run yet. |
 
@@ -28,33 +28,41 @@
   non-Citizen principal, exhaustively.
 - Design tokens: one source, five generated targets, drift-checked.
 - API + CLI + web GUI, all over the same public API, all writing the same log.
+- **Schema-first codegen (M0.4).** `crates/support/schema` is the contract;
+  `cargo xtask codegen` emits the OpenAPI document, per-event JSON Schema, the
+  gateway's operation table, the CLI command tree, and the TypeScript and
+  JavaScript clients. `--check` fails on drift, so no surface can fall behind.
+- Two gates that catch different failures: `parity` proves every operation
+  reached every generated surface; a CLI integration test proves the binary can
+  actually *run* each one. The second was demonstrated to catch a gap the first
+  waves through.
 - `cargo xtask verify`: format, clippy `-D warnings`, tests, and all three
   Canon gates — green.
 
 ## What remains before the gate closes
 
-1. **M0.4 — schema-first codegen.** The largest gap. Today the API operation
-   list and the CLI command tree are hand-written and cross-checked by
-   `cargo xtask parity`. That works, and it is not the milestone: the milestone
-   is that both are *generated* from `fractal-schema`, so drift is impossible
-   rather than detected. Everything downstream (the SDKs, the OpenAPI document,
-   the generated TypeScript client that replaces `apps/web`'s hand-written
-   fetch calls and the CLI's hand-rolled HTTP client) waits on this.
-
-2. **The simulation runner.** `fractal-testkit` has the deterministic fakes and
+1. **The simulation runner.** `fractal-testkit` has the deterministic fakes and
    they are in use. What is missing is the harness that generates histories from
    a seed and asserts the `docs/11 §7` invariants over them. Until it exists,
    ADR-0014's claim is architectural rather than demonstrated.
 
-3. **Run CI once.** Every workflow here is unexecuted. A CI file that has never
+2. **Run CI once.** Every workflow here is unexecuted. A CI file that has never
    run is a hypothesis.
 
-4. **A remote.** The repository is local-only. Push to an origin so the commit
+3. **A remote.** The repository is local-only. Push to an origin so the commit
    protocol gate has something to check against.
 
-5. **Choose a licence.** `LICENSE` is a deliberate placeholder. It interacts
+4. **Choose a licence.** `LICENSE` is a deliberate placeholder. It interacts
    with the marketplace (`docs/19`), the Extension SDK and self-hosted Nodes
    (`docs/50 PH6`), and should be decided with those in view.
+
+## Note on the two gates
+
+Adding an operation to the contract and not implementing it in the CLI passes
+`parity` — the operation is present in all five generated surfaces, because the
+generator put it there. `crates/bin/cli/tests/reachable.rs` walks the real
+argument parser and catches it. Both were verified by deliberately breaking
+them; a gate that has never failed is a gate nobody has tested.
 
 ## Note on the toolchain
 

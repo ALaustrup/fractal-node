@@ -1,28 +1,13 @@
 // PH0 walking skeleton.
 //
-// P3, and the reason this file is boring: the web GUI talks to the SAME public
-// API the CLI uses, with no private path and no privileged endpoint. In PH1 this
-// is replaced by the GENERATED client from fractal-schema (docs/30), at which
-// point hand-written fetch calls become a lint failure.
+// P3, and the reason this file has no fetch call in it: the client is GENERATED
+// from crates/support/schema by `cargo xtask codegen`. A client cannot reach an
+// endpoint the contract does not describe, and it cannot fall behind one the
+// contract adds — the build fails on drift before anyone notices.
 
-const api = {
-  async call(method, path, body) {
-    const res = await fetch(path, {
-      method,
-      headers: body ? { 'content-type': 'application/json' } : {},
-      body: body ? JSON.stringify(body) : undefined,
-    });
-    const json = await res.json().catch(() => ({
-      ok: false,
-      error: { code: 'internal', title: 'The Node sent something that is not JSON', detail: '' },
-    }));
-    if (json.ok) return json.data;
-    throw json.error ?? { code: 'internal', title: 'Refused', detail: '' };
-  },
-  health: () => api.call('GET', '/health'),
-  list: () => api.call('GET', '/v1/societies'),
-  create: (b) => api.call('POST', '/v1/societies', b),
-};
+import { createClient, FractalError } from '/api-client.js';
+
+const api = createClient();
 
 const $ = (id) => document.getElementById(id);
 
@@ -33,7 +18,8 @@ function setState(kind, label) {
   $('sync').textContent = label;
 }
 
-function showError(err) {
+function showError(e) {
+  const err = e instanceof FractalError ? e.error : e;
   const el = $('error');
   // Cause, then remedy, no apology (docs/33 §7.3).
   const remedy = err?.remedy?.human;
@@ -93,7 +79,7 @@ function render(societies) {
 
 async function refresh() {
   try {
-    const data = await api.list();
+    const data = await api.societyList();
     render(data.societies ?? []);
   } catch (err) {
     showError(err);
@@ -102,7 +88,7 @@ async function refresh() {
 
 async function boot() {
   try {
-    const h = await api.health();
+    const h = await api.nodeStatus();
     setState('live', 'LIVE');
     $('runtime').textContent = `RUNTIME ${h.runtime} · API ${h.api_version}`;
     $('path').textContent = 'FN://NODE/SOCIETIES';
@@ -120,7 +106,7 @@ $('form').addEventListener('submit', async (e) => {
   const btn = $('submit');
   btn.disabled = true;
   try {
-    await api.create({
+    await api.societyCreate({
       name: $('name').value.trim(),
       handle: $('handle').value.trim(),
       visibility: new FormData(e.target).get('visibility'),
