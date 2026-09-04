@@ -1,0 +1,7 @@
+# Workspace-wide clippy configuration.
+# Lint LEVELS live in Cargo.toml [workspace.lints]; this file is thresholds only.
+too-many-arguments-threshold = 8
+type-complexity-threshold = 300
+cognitive-complexity-threshold = 20
+# Money and ids are newtypes. A bare integer literal in a domain crate is usually a bug.
+disallowed-types = []

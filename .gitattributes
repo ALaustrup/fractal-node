@@ -1,0 +1,11 @@
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.woff2 binary
+*.pdf binary
+Cargo.lock -diff linguist-generated=false
+# Generated artefacts: reviewed as data, not as authored code (41 §12)
+/schemas/**            linguist-generated=true
+/packages/api-client/** linguist-generated=true
+/packages/event-types/** linguist-generated=true
+/packages/tokens/dist/** linguist-generated=true

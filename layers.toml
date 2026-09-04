@@ -1,0 +1,92 @@
+# THE dependency-direction contract (docs/41 §7, docs/10 §3, P5).
+# Machine-read by `cargo xtask lint-deps`. The path IS the layer declaration —
+# a crate cannot lie about its layer without physically moving.
+#
+# Rule: a crate may depend on crates in `allows` and on nothing else in this
+# workspace. External dependencies are governed separately by `bans` below.
+
+schema_version = 1
+
+# Only [dependencies] are checked. [dev-dependencies] are exempt by design: the
+# equivalence test in store-jsonl MUST see store-memory to compare the two
+# implementations against each other, and that is the test that makes P5 real.
+
+[[layer]]
+name    = "support"
+paths   = ["crates/support/*"]
+# `ports` is allowed so testkit can implement the ambient traits. Support may
+# never reach domain, app or adapter.
+allows  = ["support", "ports"]
+purpose = "Cross-layer primitives: ids, newtypes, schema registry, test fakes."
+
+[[layer]]
+name    = "ports"
+paths   = ["crates/ports"]
+allows  = ["support"]
+purpose = "Every trait from docs/10 §7. The only way out of the domain (P5)."
+
+[[layer]]
+name    = "domain"
+paths   = ["crates/domain/*"]
+allows  = ["support", "ports"]
+purpose = "Pure logic. No I/O, no vendor types, no clock, no rng. Exhaustively tested."
+
+[[layer]]
+name    = "app"
+paths   = ["crates/app/*"]
+# Intra-layer edges are permitted: handlers depend on the kernel.
+allows  = ["support", "ports", "domain", "app"]
+purpose = "Command/query handlers, sagas, and the Policy Enforcement Point (docs/10 §8)."
+
+[[layer]]
+name    = "adapter"
+paths   = ["crates/adapter/*"]
+allows  = ["support", "ports"]
+purpose = "Concrete port implementations. May NOT see domain or app — adapters implement policy, never contain it."
+
+[[layer]]
+name    = "api"
+paths   = ["crates/api/*"]
+allows  = ["support", "ports", "domain", "app", "api"]
+purpose = "Transport, authn, Envelope authz, rate limiting. Never business rules."
+
+[[layer]]
+name    = "core"
+paths   = ["crates/core/*"]
+allows  = ["support", "ports", "domain"]
+purpose = "The embeddable client core. Compiles to wasm32 (N2). No app layer: the PEP lives inside the trust boundary only (docs/61 X2)."
+
+[[layer]]
+name    = "bin"
+paths   = ["crates/bin/*"]
+allows  = ["support", "ports", "domain", "app", "adapter", "api", "core"]
+purpose = "Composition roots. The ONLY place a concrete adapter may be named."
+
+[[layer]]
+name    = "xtask"
+paths   = ["xtask"]
+allows  = ["support"]
+purpose = "The task runner. Not shipped."
+
+# ---------------------------------------------------------------------------
+# Vendor bans. A concrete vendor type inside these layers is a P5 violation.
+# `cargo xtask lint-deps` fails the build on any match.
+# ---------------------------------------------------------------------------
+[bans]
+# Nothing in the domain may reach for the world.
+domain = [
+  "sqlx", "tokio-postgres", "postgres", "rusqlite", "redis", "aws-sdk-s3",
+  "async-nats", "reqwest", "hyper", "axum", "tonic", "wasmtime",
+  "tokio", "async-std", "smol",
+  "std::time::SystemTime", "std::time::Instant",
+  "rand::thread_rng", "uuid::Uuid::new_v4", "ulid::Ulid::new",
+]
+# The domain and app layers must not float. Money never uses floats.
+ledger_forbidden_types = ["f32", "f64"]
+
+[bans.messages]
+"std::time::SystemTime" = "Use the Clock port. Determinism is what makes the invariants verifiable (ADR-0014)."
+"rand::thread_rng"      = "Use the Rng port (ADR-0014)."
+"ulid::Ulid::new"       = "Use the IdGen port (ADR-0014)."
+"tokio"                 = "The domain layer is synchronous and pure. Async belongs in app/adapter."
+"f64"                   = "Money is integer quanta. Floats in a ledger are a defect class, not a style choice."

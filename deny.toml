@@ -1,0 +1,34 @@
+# cargo-deny: supply chain is part of the security posture (P8).
+[graph]
+targets = [
+  { triple = "x86_64-unknown-linux-gnu" },
+  { triple = "wasm32-unknown-unknown" },
+]
+
+[advisories]
+version = 2
+yanked = "deny"
+ignore = []
+
+[licenses]
+version = 2
+# Permissive only. A copyleft dependency in a crate we may later ship inside a
+# desktop binary or a wasm bundle is a distribution decision, not a build one.
+allow = ["MIT", "Apache-2.0", "Apache-2.0 WITH LLVM-exception", "BSD-2-Clause",
+         "BSD-3-Clause", "ISC", "Unicode-3.0", "Zlib", "CC0-1.0", "MPL-2.0"]
+confidence-threshold = 0.93
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+# 02 §5: five new third-party runtime dependencies per phase. This is where that
+# budget is enforced for anything that would otherwise arrive transitively.
+deny = [
+  { name = "openssl", reason = "Use rustls. One TLS stack, no system OpenSSL dependency." },
+  { name = "openssl-sys", reason = "See openssl." },
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

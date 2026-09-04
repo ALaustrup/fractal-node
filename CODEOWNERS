@@ -1,0 +1,21 @@
+# Path -> the accountable HUMAN. Never an agent identity (41 §14, P4).
+# Every line here is a person who can be asked "why is this like this?"
+
+*                       @andrew
+
+# The Canon. Changing any of these requires an ADR and a human signature.
+/docs/00-foundational-principles.md   @andrew
+/docs/01-canonical-terminology.md     @andrew
+/docs/02-scope-guardrails.md          @andrew
+/docs/03-phase-authority.md           @andrew
+/docs/phases.toml                     @andrew
+/docs/adr/                            @andrew
+/AGENTS.md                            @andrew
+/layers.toml                          @andrew
+
+# Anything that decides what an agent may do unattended (P4).
+/.agents/policies/                    @andrew
+
+# The economy. Every constant here is a supply decision.
+/crates/domain/ledger/                @andrew
+/crates/domain/economy/               @andrew

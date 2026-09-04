@@ -1,0 +1,29 @@
+# build output
+/target
+**/target
+/dist
+**/dist
+node_modules/
+.pnpm-store/
+
+# generated at build time, not committed
+/apps/web/.vite
+*.tsbuildinfo
+
+# local environment
+.env
+.env.*
+!.env.example
+*.local
+
+# editors / os
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.shared.json
+
+# agent scratch (42 §: checkpoints live in refs/wip, never as files)
+/.scratch
+/.rustsetup

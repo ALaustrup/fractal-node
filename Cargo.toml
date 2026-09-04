@@ -1,0 +1,105 @@
+[workspace]
+resolver = "2"
+members = [
+  "crates/support/types",
+  "crates/support/testkit",
+  "crates/ports",
+  "crates/domain/society",
+  "crates/app/kernel",
+  "crates/app/society",
+  "crates/api/http",
+  "crates/bin/node",
+  "crates/bin/cli",
+  "xtask",
+  "crates/adapter/store-memory",
+  "crates/adapter/store-jsonl",
+  "crates/adapter/ambient-system",
+]
+
+[workspace.package]
+version      = "0.0.1"
+edition      = "2021"
+rust-version = "1.98"
+license      = "LicenseRef-Fractal-Node-Placeholder"
+repository   = "https://github.com/fractalnode/fractal-node"
+
+# ---------------------------------------------------------------------------
+# PHASE 0 DEPENDENCY BUDGET (docs/02 §5: five new runtime dependency FAMILIES).
+# Spent, in full:
+#   1. serde family     serde, serde_json, toml
+#   2. async/http       tokio, axum, tower-http
+#   3. cli              clap
+#   4. identifiers      ulid
+#   5. errors           thiserror, anyhow
+# NOT spent, deliberately:
+#   blake3 / sha2 — content addressing and the event integrity chain arrive in
+#   PH1 with the real hash. PH0 ships no placeholder cryptography rather than
+#   spending a sixth family on something that would be replaced immediately.
+#   rusqlite      — the second EventStore is a std-only append-only JSONL store,
+#   which proves the port swap (P5) without a database dependency.
+# Adding a sixth family in PH0 requires an ADR and a corresponding cut.
+# ---------------------------------------------------------------------------
+[workspace.dependencies]
+serde       = { version = "1.0", features = ["derive"] }
+serde_json  = "1.0"
+toml        = "0.8"
+tokio       = { version = "1", features = ["rt-multi-thread", "macros", "signal", "sync", "time"] }
+axum        = "0.7"
+tower-http  = { version = "0.6", features = ["trace", "cors", "fs"] }
+clap        = { version = "4", features = ["derive", "env"] }
+ulid        = { version = "1", default-features = false }
+thiserror   = "2"
+anyhow      = "1"
+
+# internal
+fractal-types   = { path = "crates/support/types" }
+fractal-schema  = { path = "crates/support/schema" }
+fractal-testkit = { path = "crates/support/testkit" }
+fractal-ports   = { path = "crates/ports" }
+fractal-domain-society = { path = "crates/domain/society" }
+fractal-app-kernel     = { path = "crates/app/kernel" }
+fractal-app-society    = { path = "crates/app/society" }
+fractal-adapter-store-memory = { path = "crates/adapter/store-memory" }
+fractal-adapter-store-jsonl  = { path = "crates/adapter/store-jsonl" }
+fractal-api-http = { path = "crates/api/http" }
+fractal-core     = { path = "crates/core/core" }
+
+[workspace.lints.rust]
+unsafe_code               = "forbid"
+missing_debug_implementations = "warn"
+rust_2018_idioms          = { level = "warn", priority = -1 }
+unreachable_pub           = "warn"
+
+[workspace.lints.clippy]
+all       = { level = "deny", priority = -1 }
+pedantic  = { level = "warn", priority = -1 }
+# docs/40: no unwrap/expect/panic in production paths. Tests opt out per-file.
+unwrap_used           = "deny"
+expect_used           = "deny"
+panic                 = "deny"
+indexing_slicing      = "deny"
+integer_division      = "deny"
+float_arithmetic      = "deny"
+todo                  = "deny"
+unimplemented         = "deny"
+dbg_macro             = "deny"
+print_stdout          = "warn"
+mod_module_files      = "warn"
+# noise we accept
+module_name_repetitions = "allow"
+missing_errors_doc      = "allow"
+must_use_candidate      = "allow"
+
+[profile.release]
+lto           = "thin"
+codegen-units = 1
+strip         = "symbols"
+panic         = "abort"
+
+[profile.dev]
+debug = 1
+
+[profile.sim]
+inherits = "release"
+debug-assertions = true
+overflow-checks  = true

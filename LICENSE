@@ -1,0 +1,12 @@
+Copyright (c) 2026 Fractal Node. All rights reserved.
+
+PLACEHOLDER — LICENCE NOT YET CHOSEN.
+
+This project has not selected a licence. Until one is chosen and this file is
+replaced, no rights are granted to copy, modify, distribute, or use this
+software beyond what applies by law.
+
+This is a deliberate placeholder, not an oversight: the licence choice interacts
+with the plugin marketplace (docs/19), the Extension SDK, and any future
+self-hosted Node distribution (docs/50 PH6), and should be made with those in
+view rather than defaulted. Tracked as an open decision in the Phase 0 exit gate.
