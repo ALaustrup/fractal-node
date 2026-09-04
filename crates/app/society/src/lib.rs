@@ -38,10 +38,6 @@ pub struct CreateSocietyRequest {
     pub handle: Handle,
     pub visibility: Visibility,
     pub idempotency_key: Option<IdempotencyKey>,
-    /// Supplied by the caller in PH0. From PH1 this is read from the Citizen
-    /// projection; the handler signature does not change when it is.
-    pub societies_founded: u32,
-    pub founder_level: u16,
 }
 
 /// A Society as read back. A projection, and therefore disposable (P6).
@@ -72,6 +68,26 @@ impl SocietyView {
             seq: seq.get(),
         }
     }
+}
+
+/// What the founding rule is allowed to read about a Citizen.
+///
+/// Derived here, never accepted from the caller. The distinction is the whole
+/// point: `societies_founded` is the input to the first-hearth gate, so a
+/// caller that can set it can mint Societies without limit. It is computed from
+/// the event log — state the caller cannot write except by going through this
+/// same gate.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Standing {
+    /// Societies this Citizen has already founded, counted from the log.
+    pub societies_founded: u32,
+    /// Level, from the XP projection. PH0 has no XP subsystem (`docs/03`), so
+    /// this is 0 for everyone. Zero is the safe value: a level that is wrongly
+    /// LOW refuses a founding that should have been allowed, which is visible
+    /// and recoverable. A level that is wrongly HIGH mints Societies. PH2
+    /// replaces the body of `Self::level_of` with a projection read and this
+    /// signature does not change.
+    pub founder_level: u16,
 }
 
 pub struct SocietyService {
@@ -119,19 +135,22 @@ impl SocietyService {
             now,
         };
 
-        // 3. The domain decides. It sees no clock, no store and no transport.
+        // 3. Standing is READ, not received. See `Standing`.
+        let standing = self.standing_of(&req.actor)?;
+
+        // 4. The domain decides. It sees no clock, no store and no transport.
         let cmd = domain::CreateSociety {
             actor: req.actor.clone(),
             name: req.name.clone(),
             handle: req.handle.clone(),
             visibility: req.visibility,
-            societies_founded: req.societies_founded,
-            founder_level: req.founder_level,
+            societies_founded: standing.societies_founded,
+            founder_level: standing.founder_level,
         };
         let (society, event) = domain::create(None, &cmd, ambient)?;
         let correlation_id = event.correlation_id;
 
-        // 4. Append. A conflict here is a real conflict: this Society is new, so
+        // 5. Append. A conflict here is a real conflict: this Society is new, so
         //    its log must be empty.
         let stored = self.store.append(society_id, Seq::FIRST, vec![event])?;
         let seq = stored.first().map_or(Seq::FIRST, |e| e.seq);
@@ -192,6 +211,68 @@ impl SocietyService {
                 .then(a.society_id.cmp(&b.society_id))
         });
         Ok(out)
+    }
+
+    /// Read this Citizen's standing from the log.
+    ///
+    /// # Errors
+    /// See [`ServiceError`].
+    ///
+    /// PH0 counts by scanning every Society on the Node, which is the same
+    /// fan-out `list` documents and the same one `docs/61`'s S15 Atlas exists
+    /// to own from PH1. Correct and slow beats fast and wrong at this size.
+    pub fn standing_of(&self, actor: &Principal) -> Result<Standing, ServiceError> {
+        let Principal::Citizen { fnid } = actor else {
+            // Only a Citizen can found (the domain enforces this too). Anyone
+            // else gets a standing that founds nothing.
+            return Ok(Standing {
+                societies_founded: 0,
+                founder_level: 0,
+            });
+        };
+        let who = fnid.to_string();
+
+        // Count FOUNDINGS, not surviving Societies. `docs/11 §5` is explicit:
+        // the first-hearth allowance is "consumed at SocietyCreated and is not
+        // restored if that Society is later Dissolved, Archived, or the founder
+        // departs — a renewable first-hearth allowance is a renewable Sybil
+        // resource." Counting live Societies would restore it on dissolution,
+        // which is the exact exploit that sentence exists to close. So the
+        // count reads the creation EVENT, which no later event can retract.
+        let mut founded: u32 = 0;
+        for id in self
+            .store
+            .societies()
+            .map_err(|source| ServiceError::Read {
+                society_id: SocietyId::new(fractal_types::Ulid::from_u128(0)),
+                source,
+            })?
+        {
+            let first =
+                self.store
+                    .read(id, Seq::FIRST, 1)
+                    .map_err(|source| ServiceError::Read {
+                        society_id: id,
+                        source,
+                    })?;
+            let founded_here = first.first().is_some_and(|e| {
+                e.envelope.kind == domain::EVENT_SOCIETY_CREATED
+                    && e.envelope.payload.get("founder").and_then(|v| v.as_str())
+                        == Some(who.as_str())
+            });
+            if founded_here {
+                founded = founded.saturating_add(1);
+            }
+        }
+        Ok(Standing {
+            societies_founded: founded,
+            founder_level: Self::level_of(fnid),
+        })
+    }
+
+    /// PH2 replaces this body with a read of the XP projection.
+    const fn level_of(_fnid: &fractal_types::Fnid) -> u16 {
+        0
     }
 
     fn find_by_correlation(
@@ -268,8 +349,6 @@ mod tests {
             handle: Handle::parse("oracle_hall").unwrap(),
             visibility: Visibility::Discoverable,
             idempotency_key: None,
-            societies_founded: 0,
-            founder_level: 0,
         }
     }
 
@@ -319,10 +398,54 @@ mod tests {
         let w = world();
         w.svc.create(&req()).unwrap();
         let mut r = req();
-        r.societies_founded = 1;
-        r.founder_level = 1;
         r.handle = Handle::parse("second_hall").unwrap();
         assert!(matches!(w.svc.create(&r), Err(ServiceError::Rejected(_))));
+        assert_eq!(
+            w.svc.list().unwrap().len(),
+            1,
+            "a refused founding must write nothing"
+        );
+    }
+
+    /// The regression this exists to prevent: standing used to arrive in the
+    /// request body, so a caller could hand itself `societies_founded: 0`
+    /// forever and mint Societies without limit. There is now no field to set.
+    /// This test asserts the derivation instead — the count the gate reads must
+    /// track the log, for this Citizen and no other.
+    #[test]
+    fn standing_is_read_from_the_log_not_the_caller() {
+        let w = world();
+        let me = Principal::Citizen {
+            fnid: Fnid::sample(1),
+        };
+        let someone_else = Principal::Citizen {
+            fnid: Fnid::sample(2),
+        };
+
+        assert_eq!(w.svc.standing_of(&me).unwrap().societies_founded, 0);
+        w.svc.create(&req()).unwrap();
+        assert_eq!(
+            w.svc.standing_of(&me).unwrap().societies_founded,
+            1,
+            "founding must move MY count"
+        );
+        assert_eq!(
+            w.svc.standing_of(&someone_else).unwrap().societies_founded,
+            0,
+            "and nobody else's"
+        );
+    }
+
+    /// PH0 has no XP subsystem, so everyone is Level 0. Stated as a test so the
+    /// day someone wires up XP, this fails and forces the seam to be revisited
+    /// rather than silently granting levels the projection never awarded.
+    #[test]
+    fn ph0_grants_nobody_a_level() {
+        let w = world();
+        let me = Principal::Citizen {
+            fnid: Fnid::sample(1),
+        };
+        assert_eq!(w.svc.standing_of(&me).unwrap().founder_level, 0);
     }
 
     #[test]

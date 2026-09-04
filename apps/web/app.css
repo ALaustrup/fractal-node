@@ -91,6 +91,14 @@ button:disabled { opacity: .45; cursor: progress; }
   border-left: 2px solid var(--fn-accent-danger); padding-left: var(--fn-space-4); }
 .error .remedy { display: block; color: var(--fn-text-tertiary); margin-top: var(--fn-space-2); }
 
+/* A warning is not a failure, so it is not danger-coloured. It is the Runtime
+   telling the truth about itself, and it should read that way. */
+.warnings { list-style: none; margin: var(--fn-space-5) 0 0; padding: 0 0 0 var(--fn-space-4);
+  border-left: 2px solid var(--fn-c-line-subtle); display: grid; gap: var(--fn-space-2); }
+.warnings li { font-family: var(--fn-font-mono); font-size: 10px; letter-spacing: .08em;
+  line-height: 1.8; color: var(--fn-text-quaternary); text-transform: uppercase; }
+.warnings li::before { content: '△ '; color: var(--fn-accent-warning, var(--fn-text-tertiary)); }
+
 .section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: var(--fn-space-5); }
 .section-head h2 { margin: 0; color: var(--fn-accent-action); }
 .list { display: grid; gap: 1px; }

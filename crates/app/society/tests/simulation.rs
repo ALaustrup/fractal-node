@@ -106,7 +106,7 @@ struct Model {
 
 #[derive(Debug)]
 enum Step {
-    CreateValid { idem: Option<String>, level: u16 },
+    CreateValid { idem: Option<String> },
     CreateBadName,
     CreateBadHandle,
     CreateAsAgent,
@@ -124,11 +124,6 @@ fn next_step(g: &Gen<'_>, model: &Model) -> Step {
     match g.below(100) {
         0..=34 => Step::CreateValid {
             idem: g.chance(40).then(|| format!("k{}", g.below(6))),
-            level: if g.chance(70) {
-                0
-            } else {
-                3 + u16::try_from(g.below(5)).unwrap_or(0)
-            },
         },
         35..=41 => Step::CreateBadName,
         42..=48 => Step::CreateBadHandle,
@@ -165,7 +160,7 @@ fn run_history(seed: u64, steps: usize) -> usize {
         let ctx = || label.clone();
 
         match step {
-            Step::CreateValid { idem, level } => {
+            Step::CreateValid { idem } => {
                 let citizen = Fnid::sample(u8::try_from(g.below(6)).unwrap_or(0));
                 let who = citizen.to_string();
                 let founded = model.founded_by.get(&who).copied().unwrap_or(0);
@@ -179,9 +174,22 @@ fn run_history(seed: u64, steps: usize) -> usize {
                         Visibility::Private,
                     ]),
                     idempotency_key: idem.clone().map(IdempotencyKey::new),
-                    societies_founded: founded,
-                    founder_level: level,
                 };
+
+                // Standing is no longer something this harness can hand the
+                // service — it is derived from the log. So the model's count
+                // becomes the ORACLE for that derivation, checked before every
+                // founding. If the derivation ever drifts from the history the
+                // simulation actually produced, this is where it is caught.
+                assert_eq!(
+                    w.svc
+                        .standing_of(&req.actor)
+                        .expect("standing is readable")
+                        .societies_founded,
+                    founded,
+                    "derived standing disagrees with the history: {}",
+                    ctx()
+                );
 
                 // An idempotent REPLAY is not re-evaluated by the domain: it
                 // returns the outcome the original call produced. The simulation
@@ -200,8 +208,12 @@ fn run_history(seed: u64, steps: usize) -> usize {
                     .as_ref()
                     .is_some_and(|k| model.by_key.contains_key(k));
 
+                // PH0 awards no levels (`SocietyService::level_of`), so the
+                // first hearth is the ONLY founding that can succeed. When XP
+                // lands, this line gains the level term back and the harness
+                // will be the thing that proves the gate still holds.
                 let first_hearth = founded == 0;
-                let should_succeed = is_replay || first_hearth || level >= 3;
+                let should_succeed = is_replay || first_hearth;
 
                 match w.svc.create(&req) {
                     Ok(v) => {
@@ -242,7 +254,7 @@ fn run_history(seed: u64, steps: usize) -> usize {
 
             Step::CreateBadName => {
                 let (bad, why) = g.bad_name();
-                let req = base_request(&g, bad, g.handle());
+                let req = base_request(bad, g.handle());
                 assert!(
                     matches!(w.svc.create(&req), Err(ServiceError::Rejected(_))),
                     "accepted a {why} name: {}",
@@ -265,7 +277,7 @@ fn run_history(seed: u64, steps: usize) -> usize {
                 // P4: policy is human-only. An Agent must never found a Society,
                 // and must never leave a trace when it tries.
                 let before = w.store.societies().unwrap().len();
-                let mut req = base_request(&g, g.name(), g.handle());
+                let mut req = base_request(g.name(), g.handle());
                 req.actor = Principal::Agent {
                     fnid: Fnid::sample(200),
                     operator: Fnid::sample(1),
@@ -388,7 +400,7 @@ fn probe_event(society_id: SocietyId, w: &World) -> fractal_ports::EventEnvelope
     }
 }
 
-fn base_request(g: &Gen<'_>, name: String, handle: String) -> CreateSocietyRequest {
+fn base_request(name: String, handle: String) -> CreateSocietyRequest {
     CreateSocietyRequest {
         actor: Principal::Citizen {
             fnid: Fnid::sample(1),
@@ -397,8 +409,6 @@ fn base_request(g: &Gen<'_>, name: String, handle: String) -> CreateSocietyReque
         handle: Handle::parse(&handle).unwrap_or_else(|_| Handle::parse("fallback").unwrap()),
         visibility: Visibility::Discoverable,
         idempotency_key: None,
-        societies_founded: 0,
-        founder_level: u16::try_from(g.below(2)).unwrap_or(0),
     }
 }
 

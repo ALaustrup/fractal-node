@@ -191,6 +191,12 @@ Fracture at Level 5 is deliberate: the most consequential operation requires a S
 
 **Founding, and the first hearth.** `18 §5.1` gates *founding a Society* at Citizen Level 3, with one deliberate exemption: **every Citizen may found exactly one Society at Level 0**, free of the K1 charge. The allowance is one-time and per-FNID, is consumed at `SocietyCreated`, and is **not restored** if that Society is later Dissolved, Archived, or the founder departs — a renewable first-hearth allowance is a renewable Sybil resource. A Crystallization does not consume it (`§3.1`'s thresholds are a stronger group-level gate than Level 3 is an individual one). The second and every subsequent Society requires `Level ≥ 3` and 250 FRC. The farmable quantity is Society *volume*, and that is where the gate sits (`61 X7`).
 
+**Standing is derived, never asserted.** Both inputs to this gate — how many Societies the Citizen has founded, and their Level — are read by the Runtime from state the caller cannot write. They are not fields on `CreateSocietyRequest` and there is no way to supply them. This is not a defensive nicety: `societies_founded` is the *entire* first-hearth gate, so a caller able to set it can found without limit, and a gate whose input the attacker controls is decoration. The count is taken from the `society.created.v1` events themselves rather than from surviving Societies, because the allowance is consumed at creation and is not restored on Dissolution — counting live Societies would hand it back, which is the exploit the paragraph above exists to close.
+
+`founder_level` has no trustworthy source until the XP projection exists (PH2, `docs/03`), so `SocietyService::level_of` returns 0 for everyone and PH0 therefore permits exactly one Society per Citizen. Zero is the correct placeholder because it fails safe: a level that is wrongly low refuses a founding that should have been allowed, which is visible and recoverable, while a level that is wrongly high mints Societies.
+
+One half of this remains open in PH0. The Node derives the count correctly, but derives it against an identity the caller still asserts (`founder_fnid`, pending PH1's passkey session, `docs/12`). Forging standing therefore costs an FNID rather than a JSON field — better, and not closed. Every affected response carries an `unauthenticated` warning in its envelope so the seam is visible in the GUI and the CLI rather than only in this document.
+
 ---
 
 ### 2.4 Membership

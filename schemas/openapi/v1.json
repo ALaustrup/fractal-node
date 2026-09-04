@@ -6,13 +6,8 @@
         "description": "Found a Society.",
         "properties": {
           "founder_fnid": {
-            "description": "PH0 only. From PH1 the actor comes from the session (`docs/12`).",
+            "description": "PH0 only. From PH1 the actor comes from the session (`docs/12`). While it is accepted, every create response carries an `unauthenticated` warning.",
             "type": "string"
-          },
-          "founder_level": {
-            "description": "PH0 only. Founding a second Society requires Level 3.",
-            "format": "int64",
-            "type": "integer"
           },
           "handle": {
             "description": "3–24 characters of a–z, 0–9, underscore.",
@@ -25,11 +20,6 @@
           "name": {
             "description": "Display name, 1–64 characters.",
             "type": "string"
-          },
-          "societies_founded": {
-            "description": "PH0 only. How many this Citizen has already founded; the first-hearth rule reads it.",
-            "format": "int64",
-            "type": "integer"
           },
           "visibility": {
             "description": "Defaults to discoverable.",

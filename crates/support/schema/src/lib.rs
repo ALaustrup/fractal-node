@@ -317,11 +317,7 @@ pub const TYPES: &[TypeDef] = &[
             Field { name: "idempotency_key", ty: Ty::Str, required: false,
                 doc: "Makes the command safe to retry for 24 hours (`docs/10 §10`)." },
             Field { name: "founder_fnid", ty: Ty::Str, required: false,
-                doc: "PH0 only. From PH1 the actor comes from the session (`docs/12`)." },
-            Field { name: "societies_founded", ty: Ty::Int, required: false,
-                doc: "PH0 only. How many this Citizen has already founded; the first-hearth rule reads it." },
-            Field { name: "founder_level", ty: Ty::Int, required: false,
-                doc: "PH0 only. Founding a second Society requires Level 3." },
+                doc: "PH0 only. From PH1 the actor comes from the session (`docs/12`). While it is accepted, every create response carries an `unauthenticated` warning." },
         ],
     },
     TypeDef {

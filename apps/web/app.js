@@ -7,7 +7,15 @@
 
 import { createClient, FractalError } from '/api-client.js';
 
-const api = createClient();
+// The warning sink. Anything the Runtime flags on a successful response lands
+// here, for every operation, without a call site having to ask for it.
+const warnings = new Set();
+const api = createClient({
+  onWarning: (w) => {
+    warnings.add(w);
+    renderWarnings();
+  },
+});
 
 const $ = (id) => document.getElementById(id);
 
@@ -36,6 +44,21 @@ function showError(e) {
 
 function clearError() {
   $('error').hidden = true;
+}
+
+// PH0 puts one real thing in the warnings channel — that the founder's identity
+// was asserted rather than proven — and showing it is deliberate: docs/00 P12
+// asks the system to be honest about what it is, and a walking skeleton that
+// looks finished is the dishonest kind.
+function renderWarnings() {
+  const el = $('warnings');
+  el.innerHTML = '';
+  for (const w of warnings) {
+    const li = document.createElement('li');
+    li.textContent = w;
+    el.appendChild(li);
+  }
+  el.hidden = warnings.size === 0;
 }
 
 function render(societies) {

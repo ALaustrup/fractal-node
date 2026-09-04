@@ -48,12 +48,8 @@ export interface CreateSocietyRequest {
   visibility?: 'public' | 'discoverable' | 'private' | 'sealed';
   /** Makes the command safe to retry for 24 hours (`docs/10 §10`). */
   idempotency_key?: string;
-  /** PH0 only. From PH1 the actor comes from the session (`docs/12`). */
+  /** PH0 only. From PH1 the actor comes from the session (`docs/12`). While it is accepted, every create response carries an `unauthenticated` warning. */
   founder_fnid?: string;
-  /** PH0 only. How many this Citizen has already founded; the first-hearth rule reads it. */
-  societies_founded?: number;
-  /** PH0 only. Founding a second Society requires Level 3. */
-  founder_level?: number;
 }
 
 /** Every Society on this Node. */
@@ -129,11 +125,24 @@ export interface ClientOptions {
   /** Base URL. Defaults to the origin serving the page. */
   baseUrl?: string;
   fetch?: typeof globalThis.fetch;
+  /**
+   * Called once per warning on every successful response.
+   *
+   * The envelope has always carried `warnings`, and this client used to
+   * return `json.data` and drop them — which made the channel decorative: the
+   * Runtime could say `unauthenticated` and no front end would ever hear it.
+   * A sink here means every operation surfaces them without a single call site
+   * having to remember to look.
+   *
+   * Defaults to `console.warn`. Silence is opt-in, and explicit.
+   */
+  onWarning?: (warning: string, operation: string) => void;
 }
 
 export function createClient(options: ClientOptions = {}) {
   const base = options.baseUrl ?? '';
   const f = options.fetch ?? globalThis.fetch.bind(globalThis);
+  const warn = options.onWarning ?? ((w: string, op: string) => console.warn(`[fractal] ${op}: ${w}`));
 
   async function call<T>(method: string, path: string, body?: unknown): Promise<T> {
     const res = await f(base + path, {
@@ -142,7 +151,10 @@ export function createClient(options: ClientOptions = {}) {
       body: body ? JSON.stringify(body) : undefined,
     });
     const json = await res.json().catch(() => null);
-    if (json && json.ok === true) return json.data as T;
+    if (json && json.ok === true) {
+      for (const w of json.warnings ?? []) warn(w, `${method} ${path}`);
+      return json.data as T;
+    }
     throw new FractalError(
       (json && json.error) ?? {
         code: 'internal',

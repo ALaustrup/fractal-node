@@ -52,14 +52,46 @@ pub fn router(state: AppState) -> Router {
 // Envelope (docs/30 §4.2)
 // ---------------------------------------------------------------------------
 
+/// The way out of each domain refusal, in the Citizen's terms.
+fn rejection_remedy(e: &fractal_domain_society::CreateError) -> &'static str {
+    use fractal_domain_society::CreateError as E;
+    match e {
+        E::NotAHuman(_) => {
+            "P4: founding enacts a Charter, so a human has to do it. Have your operator run this."
+        }
+        E::NameLength(_) | E::NameBlank => "Give it a name between 1 and 64 characters.",
+        E::LevelRequired { .. } => {
+            "Your free Society is already founded. Reaching Level 3 unlocks the next one — \
+             there is nothing to change in this request."
+        }
+        E::AlreadyExists => "That Society is already founded. Read it instead.",
+    }
+}
+
 fn ok_body(data: &serde_json::Value) -> serde_json::Value {
+    ok_body_with(data, &[])
+}
+
+/// `warnings` is for things the caller should know that are not failures. PH0
+/// uses it to say out loud that a response was produced without authentication
+/// — see `UNAUTHENTICATED_FOUNDER`. A warning is never a substitute for a
+/// refusal; it is how a known-open seam stays visible instead of silent.
+fn ok_body_with(data: &serde_json::Value, warnings: &[&'static str]) -> serde_json::Value {
     serde_json::json!({
         "ok": true,
         "data": data.clone(),
         "meta": { "api_version": API_VERSION },
-        "warnings": [],
+        "warnings": warnings,
     })
 }
+
+/// PH0 accepts the founder's identity from the request body. That is the
+/// remaining half of the standing problem: the Node now DERIVES how many
+/// Societies a Citizen has founded (`SocietyService::standing_of`), so the
+/// count can no longer be forged — but the identity it is counted against
+/// still can be. PH1's passkey session (`docs/12`) closes it. Until then every
+/// affected response says so.
+const UNAUTHENTICATED_FOUNDER: &str = "unauthenticated: the founder identity was asserted by the caller, not proven. PH1 replaces this with a passkey session (docs/12).";
 
 struct ApiError {
     code: &'static str,
@@ -142,7 +174,11 @@ impl From<ServiceError> for ApiError {
                 code: "rejected",
                 title: "Refused".to_owned(),
                 detail: r.to_string(),
-                remedy: Some("Adjust the request and send it again.".to_owned()),
+                // `docs/33 §7.3`: cause, then remedy. A remedy that does not
+                // actually remedy anything is worse than none — "adjust the
+                // request and send it again" is a lie when the refusal is
+                // about the Citizen's standing, not the request's contents.
+                remedy: Some(rejection_remedy(r).to_owned()),
                 retryable: false,
             },
             ServiceError::Append(_) => Self {
@@ -251,10 +287,6 @@ struct CreateBody {
     /// PH0 only: identity lands in PH1 and the actor comes from the session then.
     #[serde(default)]
     founder_fnid: Option<String>,
-    #[serde(default)]
-    societies_founded: u32,
-    #[serde(default)]
-    founder_level: u16,
 }
 
 async fn create_society(
@@ -288,12 +320,13 @@ async fn create_society(
         handle,
         visibility: body.visibility.unwrap_or_default(),
         idempotency_key: body.idempotency_key.map(IdempotencyKey::new),
-        societies_founded: body.societies_founded,
-        founder_level: body.founder_level,
     };
     let view = s.societies.create(&req)?;
     Ok((
         StatusCode::CREATED,
-        Json(ok_body(&serde_json::json!({ "society": view }))),
+        Json(ok_body_with(
+            &serde_json::json!({ "society": view }),
+            &[UNAUTHENTICATED_FOUNDER],
+        )),
     ))
 }
