@@ -23,6 +23,19 @@ edition      = "2021"
 rust-version = "1.98"
 license      = "LicenseRef-Fractal-Node-Placeholder"
 repository   = "https://github.com/fractalnode/fractal-node"
+# Not publishable, and saying so is not a formality. These are internal members
+# of one application, not libraries anyone should take a dependency on: the
+# layering in layers.toml is only meaningful inside this workspace, and the
+# licence above is a deliberate placeholder that grants nobody anything.
+#
+# It is also what makes `cargo deny` correct rather than merely quiet. Both
+# `licenses.private.ignore` and `bans.allow-wildcard-paths` apply ONLY to
+# unpublishable crates — cargo-deny is right to insist that a crate destined
+# for crates.io must carry a real SPDX licence and cannot use path
+# dependencies. Marking these private is the true statement that makes both
+# exemptions legitimate; setting the exemptions without it would have been
+# asking the tool to overlook something it was correct about.
+publish      = false
 
 # ---------------------------------------------------------------------------
 # PHASE 0 DEPENDENCY BUDGET (docs/02 §5: five new runtime dependency FAMILIES).
