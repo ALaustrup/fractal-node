@@ -27,3 +27,7 @@ Thumbs.db
 # agent scratch (42 §: checkpoints live in refs/wip, never as files)
 /.scratch
 /.rustsetup
+
+# The desktop app writes files delivered into this conversation here.
+# They are outputs, not sources.
+Claude outputs/
