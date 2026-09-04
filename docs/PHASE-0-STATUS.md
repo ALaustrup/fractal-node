@@ -7,13 +7,13 @@
 
 | # | Criterion | Status | Note |
 |---|---|---|---|
-| 1 | `cargo xtask verify` passes cold on Linux, macOS, Windows | **Partial** | Green on Linux. macOS and Windows unverified — no runner has executed yet. |
-| 2 | Core compiles to x86_64, aarch64, wasm32 | **Partial** | x86_64 and wasm32 verified locally. aarch64 is in CI but has not run. |
+| 1 | `cargo xtask verify` passes cold on Linux, macOS, Windows | **Partial** | Green cold on Linux from a `git archive HEAD` export — the same tree `actions/checkout` produces. macOS and Windows still unverified: no runner has executed. The workflow's fast lane was ubuntu-only and could not have satisfied this criterion however many times it ran; it is now a three-OS matrix. |
+| 2 | Core compiles to x86_64, aarch64, wasm32 | **Met** | All three built from a clean export with the CI job's exact command and crate list: x86_64 30s, aarch64 3s (gcc-aarch64-linux-gnu), wasm32 21s. |
 | 3 | Regenerating from `fractal-schema` produces a zero diff | **Met** | `cargo xtask codegen --check`: 6 artefacts, 0 drift. |
 | 4 | Regenerating tokens produces a zero diff across five targets | **Met** | `cargo xtask tokens --check` |
 | 5 | Creating a Society via web, CLI and API produces identical event streams | **Partial** | Verified by hand, and all three now share one generated client/table. Still not a test. |
 | 6 | Simulation runs 2,000 seeded histories asserting three invariants | **Met** | `cargo xtask sim`: 2,000 × 40 = 80,000 operations, 0 violations. Asserts five properties, not three. |
-| 7 | Fast-lane CI completes under 5 minutes | **Unverified** | Workflow written; no run yet. |
+| 7 | Fast-lane CI completes under 5 minutes | **Partial** | The eight fast-lane steps run green in **66s** on a cold target directory, measured on a Linux host. A hosted runner adds checkout, toolchain install and cache restore, so the real number will be higher — but not by four minutes. Unverified on a real runner, and unmeasured on Windows and macOS, which are usually the slow ones. |
 
 ## What is actually built and green
 
@@ -54,8 +54,13 @@
 
 ## What remains before the gate closes
 
-1. **Run CI once.** Every workflow here is unexecuted. A CI file that has never
-   run is a hypothesis.
+1. **Run CI once.** The fast lane and the full lane have both now been
+   executed locally from a clean export, which found and fixed a real blocker.
+   What remains genuinely unexecuted is the *hosted* part: the Windows and
+   macOS legs of the matrix (criterion 1), the aarch64 cross-compile under
+   `dtolnay/rust-toolchain`, `cargo-deny` (needs network), and the real
+   wall-clock of a runner (criterion 7). A CI file that has never run on the
+   platforms it claims to cover is still a hypothesis.
 
 2. **A remote.** The repository is local-only. Push to an origin so the commit
    protocol gate has something to check against.
@@ -87,6 +92,28 @@ Adding an operation to the contract and not implementing it in the CLI passes
 generator put it there. `crates/bin/cli/tests/reachable.rs` walks the real
 argument parser and catches it. Both were verified by deliberately breaking
 them; a gate that has never failed is a gate nobody has tested.
+
+## Note on the first clean-checkout run
+
+Attempting the fast lane against a `git archive HEAD` export — byte-for-byte
+what `actions/checkout` gives a runner — failed three gates immediately:
+contract drift, token drift and API/CLI parity. Nothing had drifted. The files
+those gates compare against were not in the repository.
+
+`**/dist` was ignored, the JavaScript reflex. But
+`packages/api-client/dist/index.js` and `packages/tokens/dist/*` are not
+bundler output — the Runtime *serves* both to the browser, so a fresh clone
+could not run the web GUI, and the three gates whose whole purpose is to prove
+no surface has fallen behind had no surface to compare against. A drift check
+against a file the repository does not contain is not a check.
+
+Every local tree had those files sitting untracked on disk, so `verify` was
+green on every machine that had ever run `codegen` — which was all of them.
+This class of defect is invisible until something builds from the repository
+rather than from a working directory, and that is the entire argument for
+running CI early rather than at the end of a phase.
+
+Fixed, and the lane now runs green from a clean export in 66 seconds.
 
 ## Note on the three findings from the first end-to-end run
 

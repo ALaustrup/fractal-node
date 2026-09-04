@@ -20,9 +20,19 @@ jobs:
   # and the feedback loop that keeps the Canon honest stops working.
   # ---------------------------------------------------------------------------
   fast:
-    name: fast lane
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # `docs/50 PH0` acceptance criterion 1 is "verify passes cold on Linux,
+    # macOS AND Windows". A single ubuntu job cannot satisfy it, and N2 makes
+    # Windows the PRIMARY platform — so a Windows failure is not a footnote,
+    # it is the headline. Linux leads the matrix only because it is the
+    # cheapest minute; fail-fast is off so one platform's failure never hides
+    # another's.
+    name: fast lane (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
@@ -30,24 +40,34 @@ jobs:
           toolchain: "1.98.1"
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+      # bash on every runner: PowerShell is the Windows default and stops on
+      # different things. One shell means one failure mode to reason about.
       - name: format
+        shell: bash
         run: cargo fmt --all --check
       - name: clippy
+        shell: bash
         run: cargo clippy --workspace --all-targets -- -D warnings
       - name: test
+        shell: bash
         run: cargo test --workspace
       # The Canon gates. These are the whole reason PH0 exists before PH1.
       - name: dependency direction (P5)
+        shell: bash
         run: cargo xtask lint-deps
       - name: contract drift (P3)
+        shell: bash
         run: cargo xtask codegen --check
       - name: token drift (N7)
+        shell: bash
         run: cargo xtask tokens --check
       - name: API/CLI parity (P13)
+        shell: bash
         run: cargo xtask parity
       # A GUI that reaches a CDN breaks local-first and privacy at once, and no
       # Rust gate can see it. This one reads the front end.
       - name: no third-party origins (P2/P9)
+        shell: bash
         run: cargo xtask offline
 
   # ---------------------------------------------------------------------------
