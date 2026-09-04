@@ -3,6 +3,16 @@
 **/target
 /dist
 **/dist
+# ...EXCEPT the two `dist` directories that are not build output at all. These
+# are the generated CONTRACT SURFACES: the Runtime serves tokens.css and
+# api-client.js to the browser at runtime (crates/bin/node/src/main.rs), and
+# `codegen --check`, `tokens --check` and `parity` all read them. Ignoring them
+# meant a fresh clone could not serve the web GUI and three gates failed on
+# every clean checkout — which is what a first CI run found.
+!/packages/api-client/dist/
+!/packages/api-client/dist/**
+!/packages/tokens/dist/
+!/packages/tokens/dist/**
 node_modules/
 .pnpm-store/
 
