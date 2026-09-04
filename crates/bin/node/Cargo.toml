@@ -1,0 +1,29 @@
+[package]
+name = "fractal-node"
+description = "The Runtime. A Node: server today, Tauri sidecar from PH2."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "fractal-node"
+path = "src/main.rs"
+
+[dependencies]
+fractal-types.workspace = true
+fractal-ports.workspace = true
+fractal-app-kernel.workspace = true
+fractal-app-society.workspace = true
+fractal-api-http.workspace = true
+fractal-adapter-store-memory.workspace = true
+fractal-adapter-store-jsonl.workspace = true
+fractal-adapter-ambient-system = { path = "../../adapter/ambient-system" }
+axum.workspace = true
+tower-http.workspace = true
+tokio.workspace = true
+clap.workspace = true
+anyhow.workspace = true
+
+[lints]
+workspace = true

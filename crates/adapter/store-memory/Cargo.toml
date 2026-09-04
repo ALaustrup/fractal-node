@@ -1,0 +1,14 @@
+[package]
+name = "fractal-adapter-store-memory"
+description = "In-memory EventStore. The reference implementation the JSONL store is checked against."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+fractal-types.workspace = true
+fractal-ports.workspace = true
+
+[lints]
+workspace = true

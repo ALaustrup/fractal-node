@@ -1,0 +1,22 @@
+[package]
+name = "fractal-api-http"
+description = "The HTTP gateway: transport, envelope, error model. No business rules."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+fractal-types.workspace = true
+fractal-ports.workspace = true
+fractal-app-kernel.workspace = true
+fractal-app-society.workspace = true
+fractal-domain-society.workspace = true
+axum.workspace = true
+tokio.workspace = true
+tower-http.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

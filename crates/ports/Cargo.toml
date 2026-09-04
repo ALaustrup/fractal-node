@@ -1,0 +1,16 @@
+[package]
+name = "fractal-ports"
+description = "Every trait from docs/10 §7. The only way out of the domain (P5)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+fractal-types.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

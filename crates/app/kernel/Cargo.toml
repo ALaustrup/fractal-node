@@ -1,0 +1,19 @@
+[package]
+name = "fractal-app-kernel"
+description = "Command context, idempotency, and the Policy Enforcement Point (docs/10 §8)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+fractal-types.workspace = true
+fractal-ports.workspace = true
+thiserror.workspace = true
+serde.workspace = true
+
+[dev-dependencies]
+fractal-testkit.workspace = true
+
+[lints]
+workspace = true

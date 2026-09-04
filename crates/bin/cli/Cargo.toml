@@ -1,0 +1,20 @@
+[package]
+name = "fractal-cli"
+description = "The `fn` binary. A first-class front end, not a wrapper (N3, P13)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "fn"
+path = "src/main.rs"
+
+[dependencies]
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+
+[lints]
+workspace = true

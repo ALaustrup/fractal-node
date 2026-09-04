@@ -1,0 +1,22 @@
+[package]
+name = "fractal-app-society"
+description = "Command and query handlers for the Society boundary."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+fractal-types.workspace = true
+fractal-ports.workspace = true
+fractal-domain-society.workspace = true
+fractal-app-kernel.workspace = true
+thiserror.workspace = true
+serde.workspace = true
+
+[dev-dependencies]
+fractal-testkit.workspace = true
+fractal-adapter-store-memory.workspace = true
+
+[lints]
+workspace = true
