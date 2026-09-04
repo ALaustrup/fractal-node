@@ -39,10 +39,16 @@ jobs:
       # The Canon gates. These are the whole reason PH0 exists before PH1.
       - name: dependency direction (P5)
         run: cargo xtask lint-deps
+      - name: contract drift (P3)
+        run: cargo xtask codegen --check
       - name: token drift (N7)
         run: cargo xtask tokens --check
       - name: API/CLI parity (P13)
         run: cargo xtask parity
+      # A GUI that reaches a CDN breaks local-first and privacy at once, and no
+      # Rust gate can see it. This one reads the front end.
+      - name: no third-party origins (P2/P9)
+        run: cargo xtask offline
 
   # ---------------------------------------------------------------------------
   # N2: cross-platform from day zero, not as a later port. The core must compile

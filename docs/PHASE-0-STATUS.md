@@ -17,9 +17,9 @@
 
 ## What is actually built and green
 
-- 13-crate Rust workspace, layered, with the dependency direction enforced by
-  `cargo xtask lint-deps` (13 crates, 0 violations).
-- 46 tests passing. The load-bearing ones: a Level 0 Citizen can found their
+- 14-crate Rust workspace, layered, with the dependency direction enforced by
+  `cargo xtask lint-deps` (14 crates, 0 violations).
+- 56 tests passing. The load-bearing ones: a Level 0 Citizen can found their
   first Society; an Agent cannot found one; a retried command creates one
   Society rather than two; replayed state equals the projection.
 - Two `EventStore` implementations under a behavioural equivalence test
@@ -43,7 +43,13 @@
   reached every generated surface; a CLI integration test proves the binary can
   actually *run* each one. The second was demonstrated to catch a gap the first
   waves through.
-- `cargo xtask verify`: format, clippy `-D warnings`, tests, and all three
+- **The offline gate (`cargo xtask offline`).** Reads the front end and fails
+  the build on any reference to an origin that is not this Node. Added after
+  the walking skeleton was caught loading its fonts from a CDN — see the note
+  below.
+- **Standing is derived, not asserted.** The first-hearth gate's inputs are
+  read from the event log rather than the request body; `docs/11 §2.3`.
+- `cargo xtask verify`: format, clippy `-D warnings`, tests, and all five
   Canon gates — green.
 
 ## What remains before the gate closes
@@ -81,6 +87,42 @@ Adding an operation to the contract and not implementing it in the CLI passes
 generator put it there. `crates/bin/cli/tests/reachable.rs` walks the real
 argument parser and catches it. Both were verified by deliberately breaking
 them; a gate that has never failed is a gate nobody has tested.
+
+## Note on the three findings from the first end-to-end run
+
+Running the whole loop for real — CLI create, then the same Societies read back
+through a browser — found three defects that every green gate had missed. All
+three are fixed, and the fixes were kept honest by first breaking them again:
+
+1. **The founding gate read its input from the caller.** `societies_founded`
+   and `founder_level` arrived in the request body and defaulted to zero, so
+   the first-hearth allowance renewed on every request and both demo Societies
+   were recorded as `origin: first_hearth`. The Runtime now derives both from
+   the log. Injecting the original bug fails two unit tests and is caught by
+   the simulation at seed 0, step 10. Half the hole remains open by design:
+   the identity the count is taken against is still asserted (PH1's passkey
+   session closes it), and every affected response now says so in its
+   `warnings`.
+
+2. **The GUI loaded its typography from `fonts.googleapis.com`.** P2 and P9,
+   broken silently, past seven gates that were all reading Rust. The fonts are
+   vendored (76 KB, latin, SIL OFL) and `cargo xtask offline` now refuses any
+   third-party reference. Verified against six evasions, including a
+   protocol-relative `//host` URL and a `fetch()` to an analytics endpoint, and
+   verified not to fire on prose that merely names a URL.
+
+3. **No favicon**, so every page load 404'd. Added as an SVG built from the
+   header mark.
+
+A fourth surfaced while fixing the first: the generated client returned
+`json.data` and discarded the envelope's `warnings` entirely, which made the
+warning channel decorative — the Runtime could say `unauthenticated` and no
+front end would ever hear it. `createClient` now takes an `onWarning` sink,
+defaulting to `console.warn`, drained on every successful response.
+
+The pattern in all four is one thing: **every gate was reading the Rust.**
+Nothing read the front end, and nothing ran the system end to end. Both are now
+in CI.
 
 ## Note on the toolchain
 

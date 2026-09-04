@@ -8,6 +8,7 @@
 
 mod codegen;
 mod lint_deps;
+mod offline;
 mod parity;
 mod tokens;
 
@@ -22,6 +23,7 @@ fn main() -> Result<()> {
         "codegen" => codegen::run(check),
         "lint-deps" => lint_deps::run(),
         "tokens" => tokens::run(check),
+        "offline" => offline::run(),
         "parity" => parity::run(),
         "sim" => sim(),
         "verify" => verify(),
@@ -42,6 +44,7 @@ fn print_help() {
     println!("  codegen [--check] Generate every surface from crates/support/schema; --check fails on drift");
     println!("  lint-deps        Enforce layers.toml: dependency direction and vendor bans (P5)");
     println!("  tokens [--check] Generate the design tokens for every target; --check fails on drift (N7)");
+    println!("  offline          The web app must load nothing from another origin (P2/P9)");
     println!("  parity           Every API operation must have a CLI command (P13)");
     println!("  sim              2,000 seeded histories against the domain invariants (ADR-0014)");
     println!("  verify           Everything a commit must pass, in the order CI runs it");
@@ -68,6 +71,7 @@ fn verify() -> Result<()> {
     codegen::run(true)?;
     tokens::run(true)?;
     parity::run()?;
+    offline::run()?;
     println!("\n\u{1b}[38;2;140;232;223m⌁\u{1b}[0m verify: all gates green");
     Ok(())
 }

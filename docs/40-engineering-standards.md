@@ -702,6 +702,16 @@ Three gates run per PR:
 
 `00 §5` criterion 2 requires every capability to be reachable through the API, the CLI, and a GUI. A **parity test** derives the CLI verb list from the OpenAPI operation list and fails on any operation with no CLI verb. That is P13's falsification test as a build step rather than a release-day audit, which is the difference between a principle and a slogan.
 
+### 7.7.1 The offline gate (P2 and P9)
+
+`cargo xtask offline` reads every HTML, CSS, JS and SVG file under `apps/web` and fails the build on any reference the browser would fetch from an origin that is not this Node — `src`, `href`, `srcset`, `url()`, `@import`, an ES `import ... from`, or a direct `fetch`. Protocol-relative `//host` counts; comments and licence prose that merely *name* a URL do not, because the check reads reference positions rather than loose text.
+
+This gate exists because PH0 shipped without it. The first web GUI linked its typography from `fonts.googleapis.com` and every other gate passed — `fmt`, `clippy`, the tests, dependency direction, codegen drift, token drift and parity were all watching the Rust, and none of them could see a `<link>` tag. The result broke two principles simultaneously and silently: a Node with no internet lost its type system (P2), and every page load announced a Citizen to a third party (P9). It was found by loading the page in a browser and reading the network log — which is a thing a person has to remember to do, and therefore not a control.
+
+The rule that generalises: **a principle that constrains a surface no gate reads is not enforced, however clearly it is written down.** When a principle's blast radius extends beyond Rust, something has to read the other surface. `docs/00 §5` criterion 8 is satisfied by a gate, never by a paragraph.
+
+The remedy is always the same and is stated in the failure: vendor the asset into `apps/web` and reference it by an absolute path on this Node. The fonts live in `apps/web/fonts` under their SIL Open Font Licence, latin subset, 76 KB total.
+
 ### 7.8 End-to-end tests
 
 E2E tests are expensive, slow, and flaky in proportion to their number. We cap them at **20 total** through Phase 5 and require a named justification per test. They exist only for flows where the integration of front end, gateway, Runtime, and adapters is itself the risk:
