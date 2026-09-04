@@ -1,0 +1,46 @@
+# The current phase, machine-readable. `cargo xtask phase-check` (M0.2) asserts
+# that no Work Unit targets a capability outside it.
+#
+# docs/03-phase-authority.md is the authority; this file is its cursor.
+
+current = "PH0"
+
+[PH0]
+name = "Foundation"
+goal = "The repository can build, test and release itself, and one trivial end-to-end path works from browser to log and back."
+exit_gate = "docs/50 PH0 acceptance criteria 1–7, all green, with zero open ADRs."
+
+milestones = [
+  "M0.1 repo and Canon",
+  "M0.2 toolchain and gates",
+  "M0.3 CI/CD skeleton",
+  "M0.4 schema-first codegen",
+  "M0.5 design token pipeline",
+  "M0.6 determinism harness",
+  "M0.7 walking skeleton",
+  "M0.8 agent working agreement",
+]
+
+# docs/02 §5. Exceeding any line is a phase failure, not a stretch goal.
+[PH0.budget]
+new_services = 0
+new_api_resource_families = 1     # societies
+new_dependency_families = 5       # serde · async/http · clap · ulid · errors
+new_client_platforms = 1          # web
+new_economic_sources = 0
+
+[PH0.spent]
+new_services = 0
+new_api_resource_families = 1
+new_dependency_families = 5
+new_client_platforms = 1
+new_economic_sources = 0
+
+# Adopted from docs/70 and confirmed by Andrew. These enter PH1, and docs/70 §13
+# names what leaves PH1 to pay for them: the full Profile Module catalogue and
+# the search surface both move to PH2.
+[PH1.adopted_proposals]
+the_commons = "docs/70 §1 — a live Society every Citizen lands in at Level 0"
+platform_charter = "docs/70 §2 — the operator binds itself with the same machinery Societies use"
+instrument_panel = "docs/70 §3 — public, live supply and integrity data (P12 made checkable)"
+undo_window = "docs/70 §4 — a stated, visible reversal window on consequential actions"

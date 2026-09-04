@@ -1,0 +1,24 @@
+# docs/02 §6: the four questions, as a PR-body schema. CI checks that each is
+# answered; a human checks whether the answers are any good.
+
+[[question]]
+id = "principle"
+prompt = "Which principle does this serve?"
+format = "P1..P13, or N1..N8"
+rejects = ["none", "n/a", "general improvement"]
+
+[[question]]
+id = "phase"
+prompt = "Which phase does docs/phases.toml place this in?"
+format = "PH<n> M<n.n>"
+note = "If it is not the current phase, stop and write docs/proposals/NNNN-title.md instead."
+
+[[question]]
+id = "smallest"
+prompt = "What is the smallest version that makes the spine sentence more true?"
+note = "docs/02 §2. Build that one."
+
+[[question]]
+id = "forever_cost"
+prompt = "What will this cost forever — operations, support, versioning, security surface?"
+rejects = ["nothing", "none"]

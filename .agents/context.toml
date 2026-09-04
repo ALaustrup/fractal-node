@@ -1,0 +1,43 @@
+# Required reading, by path. An agent loads these BEFORE touching a file that
+# matches. `docs/AGENTS.md` §1 is the human statement of the same rule.
+
+[[rule]]
+paths = ["**/*"]
+load  = [
+  "AGENTS.md",
+  "docs/00-foundational-principles.md",
+  "docs/01-canonical-terminology.md",
+  "docs/02-scope-guardrails.md",
+  "docs/03-phase-authority.md",
+]
+why = "The Canon. Four files. Not optional, not skimmable."
+
+[[rule]]
+paths = ["crates/domain/**"]
+load  = ["docs/11-domain-model.md", "layers.toml"]
+why = "The domain is pure. layers.toml is what stops it becoming impure."
+
+[[rule]]
+paths = ["crates/app/**", "crates/api/**"]
+load  = ["docs/10-system-architecture.md", "docs/30-api-and-sdk.md"]
+why = "The Policy Enforcement Point and the public contract both live here."
+
+[[rule]]
+paths = ["crates/ports/**", "crates/adapter/**"]
+load  = ["docs/10-system-architecture.md", "docs/adr/0014-deterministic-simulation-testing.md"]
+why = "Ports are the P5 surface; the ambient three are what make replay possible."
+
+[[rule]]
+paths = ["crates/bin/cli/**"]
+load  = ["docs/31-cli-and-terminal.md", "docs/32-design-system.md"]
+why = "The CLI is a first-class front end with a designed surface (N3, N7)."
+
+[[rule]]
+paths = ["apps/web/**", "packages/**"]
+load  = ["docs/32-design-system.md", "docs/33-brand-identity.md", "docs/51-phase-1-web-gui.md"]
+why = "A colour that is not a token cannot ship."
+
+[[rule]]
+paths = ["docs/**"]
+load  = ["docs/61-reconciliation.md"]
+why = "49 cross-chapter conflicts already have rulings. Check before re-deciding one."

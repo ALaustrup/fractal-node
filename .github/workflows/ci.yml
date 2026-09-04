@@ -1,0 +1,122 @@
+name: ci
+
+on:
+  push: { branches: [main] }
+  pull_request:
+  merge_group:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # FAST LANE — must stay under 5 minutes (docs/50 PH0 acceptance criterion 7).
+  # If it creeps past that, agents start batching work to avoid waiting for it,
+  # and the feedback loop that keeps the Canon honest stops working.
+  # ---------------------------------------------------------------------------
+  fast:
+    name: fast lane
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.98.1"
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: format
+        run: cargo fmt --all --check
+      - name: clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: test
+        run: cargo test --workspace
+      # The Canon gates. These are the whole reason PH0 exists before PH1.
+      - name: dependency direction (P5)
+        run: cargo xtask lint-deps
+      - name: token drift (N7)
+        run: cargo xtask tokens --check
+      - name: API/CLI parity (P13)
+        run: cargo xtask parity
+
+  # ---------------------------------------------------------------------------
+  # N2: cross-platform from day zero, not as a later port. The core must compile
+  # to every target from the first commit — a target that is only added in PH5 is
+  # a target that is discovered to be impossible in PH5.
+  # ---------------------------------------------------------------------------
+  targets:
+    name: tri-target build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu, wasm32-unknown-unknown]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.98.1"
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+      - name: install cross linker
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: sudo apt-get update && sudo apt-get install -y gcc-aarch64-linux-gnu
+      - name: build core for ${{ matrix.target }}
+        run: |
+          cargo build --target ${{ matrix.target }} \
+            -p fractal-types -p fractal-ports -p fractal-domain-society
+
+  # ---------------------------------------------------------------------------
+  # FULL LANE — allowed to be slow. Not required for a green PR check, required
+  # before a release tag.
+  # ---------------------------------------------------------------------------
+  full:
+    name: full lane
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.event_name != 'pull_request' || github.base_ref == 'main'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with: { toolchain: "1.98.1" }
+      - uses: Swatinem/rust-cache@v2
+      - name: cargo-deny
+        uses: EmbarkStudios/cargo-deny-action@v2
+        with: { command: check }
+      - name: docs build clean
+        run: cargo doc --workspace --no-deps
+      - name: release build
+        run: cargo build --release --workspace
+
+  # ---------------------------------------------------------------------------
+  # docs/42: commits are composed by agents at MILESTONE granularity. The message
+  # is a machine-checkable contract, so it is checked by a machine.
+  # ---------------------------------------------------------------------------
+  commits:
+    name: commit protocol
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: conventional commits and required trailers
+        run: |
+          base="${{ github.event.pull_request.base.sha }}"
+          fail=0
+          while read -r sha; do
+            subject=$(git log -1 --format=%s "$sha")
+            body=$(git log -1 --format=%B "$sha")
+            if ! echo "$subject" | grep -qE '^(feat|fix|docs|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9-]+\))?!?: .+'; then
+              echo "::error::not a Conventional Commit: $subject"; fail=1
+            fi
+            for trailer in Work-Unit Milestone Principle; do
+              echo "$body" | grep -q "^$trailer:" || { echo "::error::missing $trailer trailer: $subject"; fail=1; }
+            done
+          done < <(git rev-list "$base"..HEAD)
+          exit $fail
