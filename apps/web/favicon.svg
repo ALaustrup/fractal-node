@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Fractal Node">
+  <!-- Token values, inlined. A favicon is fetched before any stylesheet, so it
+       cannot read var(--fn-*): these two literals are the one place in the web
+       app where a raw hex is correct, and xtask's token-drift check knows it.
+         #040608 = core.color.void      (--fn-bg-page)
+         #8ce8df = core.color.signal    (--fn-accent-action)  -->
+  <rect width="32" height="32" rx="7" fill="#040608"/>
+  <!-- The same polyline as the header mark, scaled 12→32 and centred. -->
+  <path d="M4.7 23.5 L13.8 14.4 L20.2 20.8 L29.3 11.7"
+        fill="none" stroke="#8ce8df" stroke-width="3.2"
+        stroke-linecap="square" stroke-linejoin="miter"/>
+</svg>

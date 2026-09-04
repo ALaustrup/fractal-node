@@ -1,0 +1,51 @@
+/* Self-hosted. There is no network dependency in the type system.
+ *
+ * The GUI used to pull these from fonts.googleapis.com, which broke two
+ * principles at once: P2 (local-first — a Node with no internet lost its
+ * typography) and P9 (privacy by default — every page load told Google who was
+ * looking at a Fractal Node). 76 KB of woff2 buys both back.
+ *
+ * Both faces are SIL Open Font License 1.1; the licences sit beside them in
+ * this directory, which is what the OFL asks for.
+ *
+ * Latin subset only, matching the unicode-range Google Fonts itself serves.
+ * A Society writing outside Latin falls through to the stack in tokens.css and
+ * still renders — never to a box. Widening this is a PH1 decision (docs/32).
+ */
+
+/* Manrope — variable, one file for the whole 200–600 range the design uses. */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url('/fonts/manrope-latin-var.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* DM Mono — static. There is no variable cut; these are the three weights
+ * docs/32 actually specifies, and shipping a fourth "just in case" is the kind
+ * of thing docs/02's complexity budget exists to refuse. */
+@font-face {
+  font-family: 'DM Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300;
+  src: url('/fonts/dm-mono-latin-300.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DM Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('/fonts/dm-mono-latin-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DM Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('/fonts/dm-mono-latin-500.woff2') format('woff2');
+}
