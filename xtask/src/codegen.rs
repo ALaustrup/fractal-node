@@ -80,8 +80,23 @@ fn rustfmt(src: &str) -> Result<String> {
     use std::io::Write as _;
     use std::process::{Command, Stdio};
 
+    // `newline_style` is passed explicitly rather than left to rustfmt.toml.
+    // Reading from stdin, rustfmt looks for that file relative to the current
+    // directory — so whether the generated code comes out LF or CRLF would
+    // depend on where xtask happened to be invoked from. On Windows the
+    // default (`Auto`) emits CRLF, `codegen --check` compares bytes, and the
+    // gate fails for a reason that has nothing to do with the contract. One
+    // flag makes the output identical on all three platforms.
     let mut child = Command::new("rustfmt")
-        .args(["--edition", "2021", "--emit", "stdout", "--quiet"])
+        .args([
+            "--edition",
+            "2021",
+            "--emit",
+            "stdout",
+            "--quiet",
+            "--config",
+            "newline_style=Unix",
+        ])
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()

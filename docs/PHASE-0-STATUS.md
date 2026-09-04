@@ -55,7 +55,10 @@
 ## What remains before the gate closes
 
 1. **Run CI once.** The fast lane and the full lane have both now been
-   executed locally from a clean export, which found and fixed a real blocker.
+   executed locally from a clean export — including `cargo-deny`, which had
+   never run anywhere and failed on two counts when it did. Between them these
+   local runs found and fixed three CI blockers before a runner ever saw
+   them.
    What remains genuinely unexecuted is the *hosted* part: the Windows and
    macOS legs of the matrix (criterion 1), the aarch64 cross-compile under
    `dtolnay/rust-toolchain`, `cargo-deny` (needs network), and the real
@@ -92,6 +95,40 @@ Adding an operation to the contract and not implementing it in the CLI passes
 generator put it there. `crates/bin/cli/tests/reachable.rs` walks the real
 argument parser and catches it. Both were verified by deliberately breaking
 them; a gate that has never failed is a gate nobody has tested.
+
+## Note on the Windows leg, before it has run
+
+Windows is the primary platform (N2) and the fast lane had never targeted it.
+Rather than push and wait, the hazards were tested here as far as a Linux host
+can test them.
+
+**Line endings — real, and already covered.** Rewriting the working tree to
+CRLF fails `codegen --check`, `tokens --check` and `cargo fmt --check`
+immediately: those gates compare bytes, and a CRLF checkout changes every one
+of them. But cloning with `core.autocrlf=true` — exactly the config a hosted
+Windows runner carries — produces an LF working tree anyway, because
+`.gitattributes` has forced `* text=auto eol=lf` since the first commit, and
+the woff2 files come back byte-identical because they are marked `binary`. All
+six gates pass on that clone. The protection was already there; now it is
+demonstrated rather than assumed.
+
+**One real gap, closed.** `codegen` pipes generated Rust through `rustfmt` via
+stdin, and rustfmt resolves `rustfmt.toml` relative to the *current directory*
+— so `newline_style` depended on where xtask was invoked from. On Windows the
+default is CRLF, which would have failed `codegen --check` for a reason with
+nothing to do with the contract. Now passed explicitly as
+`--config newline_style=Unix`.
+
+**Checked and clean:** no reserved device names (CON, PRN, AUX, NUL, COM*,
+LPT*), no characters illegal in Windows paths, no case-only filename
+collisions, no trailing dots or spaces, no path over 200 characters, no
+symlinks, no file-permission assumptions, no test asserting on a POSIX path
+string. One external command is invoked — `rustfmt` — which rustup shims on
+every platform.
+
+What this does NOT establish: that the Rust toolchain, the tests and the
+adapters behave identically on a real NTFS filesystem. Only the runner answers
+that.
 
 ## Note on the first clean-checkout run
 
