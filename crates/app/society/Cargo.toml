@@ -15,6 +15,7 @@ thiserror.workspace = true
 serde.workspace = true
 
 [dev-dependencies]
+serde_json.workspace = true
 fractal-testkit.workspace = true
 fractal-adapter-store-memory.workspace = true
 

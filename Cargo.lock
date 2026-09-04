@@ -291,6 +291,7 @@ dependencies = [
  "fractal-testkit",
  "fractal-types",
  "serde",
+ "serde_json",
  "thiserror",
 ]
 

@@ -11,6 +11,10 @@
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
+mod gen;
+
+pub use gen::Gen;
+
 use fractal_ports::{Clock, IdGen, Rng};
 use fractal_types::{Timestamp, Ulid};
 use std::sync::atomic::{AtomicI64, AtomicU64, Ordering};

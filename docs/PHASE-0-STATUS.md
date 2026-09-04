@@ -12,7 +12,7 @@
 | 3 | Regenerating from `fractal-schema` produces a zero diff | **Met** | `cargo xtask codegen --check`: 6 artefacts, 0 drift. |
 | 4 | Regenerating tokens produces a zero diff across five targets | **Met** | `cargo xtask tokens --check` |
 | 5 | Creating a Society via web, CLI and API produces identical event streams | **Partial** | Verified by hand, and all three now share one generated client/table. Still not a test. |
-| 6 | Simulation runs 2,000 seeded histories asserting three invariants | **Not met** | Fakes exist; the runner does not. |
+| 6 | Simulation runs 2,000 seeded histories asserting three invariants | **Met** | `cargo xtask sim`: 2,000 × 40 = 80,000 operations, 0 violations. Asserts five properties, not three. |
 | 7 | Fast-lane CI completes under 5 minutes | **Unverified** | Workflow written; no run yet. |
 
 ## What is actually built and green
@@ -32,6 +32,13 @@
   `cargo xtask codegen` emits the OpenAPI document, per-event JSON Schema, the
   gateway's operation table, the CLI command tree, and the TypeScript and
   JavaScript clients. `--check` fails on drift, so no surface can fall behind.
+- **The simulation harness (M0.6).** 2,000 seeded histories × 40 steps = 80,000
+  generated operations, asserting five properties after every single step:
+  I-1 (every event names its owning Society, and sequences are dense), I-10
+  (the projection always equals a fresh replay), I-14 (a sealed log never
+  grows), idempotency (a retried command never mints a second Society), and P4
+  (no Society was ever founded by a non-human principal). A failure names the
+  seed and step, so it reproduces exactly.
 - Two gates that catch different failures: `parity` proves every operation
   reached every generated surface; a CLI integration test proves the binary can
   actually *run* each one. The second was demonstrated to catch a gap the first
@@ -41,20 +48,31 @@
 
 ## What remains before the gate closes
 
-1. **The simulation runner.** `fractal-testkit` has the deterministic fakes and
-   they are in use. What is missing is the harness that generates histories from
-   a seed and asserts the `docs/11 §7` invariants over them. Until it exists,
-   ADR-0014's claim is architectural rather than demonstrated.
-
-2. **Run CI once.** Every workflow here is unexecuted. A CI file that has never
+1. **Run CI once.** Every workflow here is unexecuted. A CI file that has never
    run is a hypothesis.
 
-3. **A remote.** The repository is local-only. Push to an origin so the commit
+2. **A remote.** The repository is local-only. Push to an origin so the commit
    protocol gate has something to check against.
 
-4. **Choose a licence.** `LICENSE` is a deliberate placeholder. It interacts
+3. **Choose a licence.** `LICENSE` is a deliberate placeholder. It interacts
    with the marketplace (`docs/19`), the Extension SDK and self-hosted Nodes
    (`docs/50 PH6`), and should be decided with those in view.
+
+## Note on falsifying the simulation
+
+Three bugs were deliberately injected to check the harness could see them: a
+no-op `seal()`, a replay that drops a field, and a Policy Enforcement Point that
+waves Agents through. The second and third were caught immediately.
+
+**The first was not**, and that finding was worth more than the other two. I-14
+was asserted after every step but never *exercised* — nothing in the simulation
+ever tried to write to a sealed Society, so the assertion could not fire. The
+step that was supposed to do it was a comment saying the invariant would handle
+it. After adding a real append attempt, the same injected bug is caught at seed
+0, step 29.
+
+An invariant that is checked but never exercised is decoration, and the only way
+to tell the difference is to break the thing on purpose.
 
 ## Note on the two gates
 

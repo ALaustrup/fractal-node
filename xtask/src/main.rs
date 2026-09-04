@@ -23,6 +23,7 @@ fn main() -> Result<()> {
         "lint-deps" => lint_deps::run(),
         "tokens" => tokens::run(check),
         "parity" => parity::run(),
+        "sim" => sim(),
         "verify" => verify(),
         "help" | "--help" | "-h" => {
             print_help();
@@ -42,6 +43,7 @@ fn print_help() {
     println!("  lint-deps        Enforce layers.toml: dependency direction and vendor bans (P5)");
     println!("  tokens [--check] Generate the design tokens for every target; --check fails on drift (N7)");
     println!("  parity           Every API operation must have a CLI command (P13)");
+    println!("  sim              2,000 seeded histories against the domain invariants (ADR-0014)");
     println!("  verify           Everything a commit must pass, in the order CI runs it");
 }
 
@@ -77,6 +79,34 @@ fn step(name: &str, args: &[&str]) -> Result<()> {
         .status()?;
     if !status.success() {
         bail!("{name} failed");
+    }
+    Ok(())
+}
+
+/// The full simulation: 2,000 seeded histories, the number `docs/50 PH0`
+/// acceptance criterion 6 names.
+///
+/// Not part of `verify` at full scale — `cargo test` runs 200 histories, which
+/// is enough to catch a regression while keeping the inner loop fast. CI runs
+/// this one. The distinction matters: a gate slow enough that people stop
+/// running it is not a gate.
+fn sim() -> Result<()> {
+    println!("\n== simulation ==");
+    let status = std::process::Command::new(env!("CARGO"))
+        .args([
+            "test",
+            "--release",
+            "-p",
+            "fractal-app-society",
+            "--test",
+            "simulation",
+            "--",
+            "--nocapture",
+        ])
+        .env("FRACTAL_SIM_HISTORIES", "2000")
+        .status()?;
+    if !status.success() {
+        bail!("simulation failed — the seed and step in the panic reproduce it exactly");
     }
     Ok(())
 }
