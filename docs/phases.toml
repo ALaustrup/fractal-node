@@ -1,0 +1,1962 @@
+# docs/phases.toml - the machine-readable phase authority.
+#
+# GENERATED CONTRACT. This file and docs/03-phase-authority.md are the two
+# halves of one artifact and change only together, under an ADR (03 §6).
+# Schema: 03 §5.2.  Assertions: cargo xtask phase-check / lint-phases (03 §5.3).
+#
+# Every phase column elsewhere in the corpus is RENDERED from this file and is
+# non-normative (03 §0). A hand-authored phase claim fails the build.
+
+schema_version = 1
+authority      = "docs/03-phase-authority.md"
+current_phase  = "PH0"
+
+# -----------------------------------------------------------------------------
+#  PHASES
+# -----------------------------------------------------------------------------
+
+[[phase]]
+id              = "PH0"
+ordinal         = 0
+name            = "Foundation"
+goal            = "The repository can build, test, and release itself, and one trivial end-to-end path works from browser to database and back."
+nominal_weeks   = 3
+realistic_weeks = [3, 4]
+cut_candidate   = "none - PH0 is irreducible"
+
+  [phase.budget]                 # 02 §5, as amended by 03 §4.1
+  services     = 2
+  api_families = 3
+  dependencies = 5               # PER DEPLOYABLE ARTIFACT (03 §4.1)
+  platforms    = 1
+  sources      = 2
+  open_adrs    = 0
+
+[[phase]]
+id              = "PH1"
+ordinal         = 1
+name            = "The Spine"
+goal            = "A Citizen can register, create a Society, talk in it, hold Fraction, and see their progression - from a web GUI, a CLI, and the API, at production quality."
+nominal_weeks   = 10
+realistic_weeks = [24, 30]
+cut_candidate   = "density modes and half the component inventory"
+
+  [phase.budget]                 # 02 §5, as amended by 03 §4.1
+  services     = 2
+  api_families = 3
+  dependencies = 5               # PER DEPLOYABLE ARTIFACT (03 §4.1)
+  platforms    = 1
+  sources      = 2
+  open_adrs    = 0
+
+[[phase]]
+id              = "PH2"
+ordinal         = 2
+name            = "The Node"
+goal            = "The application works offline, runs as a real desktop Node, and holds media."
+nominal_weeks   = 10
+realistic_weeks = [20, 25]
+cut_candidate   = "responsive ultrawide and density modes"
+
+  [phase.budget]                 # 02 §5, as amended by 03 §4.1
+  services     = 2
+  api_families = 3
+  dependencies = 5               # PER DEPLOYABLE ARTIFACT (03 §4.1)
+  platforms    = 1
+  sources      = 2
+  open_adrs    = 0
+
+[[phase]]
+id              = "PH3"
+ordinal         = 3
+name            = "The Agent"
+goal            = "Agents are real, bounded, auditable participants, and the platform extends itself through the same API third parties will use."
+nominal_weeks   = 10
+realistic_weeks = [20, 24]
+cut_candidate   = "Governance v1"
+
+  [phase.budget]                 # 02 §5, as amended by 03 §4.1
+  services     = 2
+  api_families = 3
+  dependencies = 5               # PER DEPLOYABLE ARTIFACT (03 §4.1)
+  platforms    = 1
+  sources      = 2
+  open_adrs    = 0
+
+[[phase]]
+id              = "PH4"
+ordinal         = 4
+name            = "The Mesh"
+goal            = "Storage becomes distributed and compensated, the economy starts emitting, and people can talk and see each other."
+nominal_weeks   = 14
+realistic_weeks = [30, 40]
+cut_candidate   = "video and the Stage"
+
+  [phase.budget]                 # 02 §5, as amended by 03 §4.1
+  services     = 2
+  api_families = 3
+  dependencies = 5               # PER DEPLOYABLE ARTIFACT (03 §4.1)
+  platforms    = 1
+  sources      = 2
+  open_adrs    = 0
+
+[[phase]]
+id              = "PH5"
+ordinal         = 5
+name            = "Fracture"
+goal            = "The namesake operation works, and the platform is native on every screen."
+nominal_weeks   = 16
+realistic_weeks = [30, 40]
+cut_candidate   = "Seasons infrastructure"
+
+  [phase.budget]                 # 02 §5, as amended by 03 §4.1
+  services     = 2
+  api_families = 3
+  dependencies = 5               # PER DEPLOYABLE ARTIFACT (03 §4.1)
+  platforms    = 1
+  sources      = 2
+  open_adrs    = 0
+
+[[phase]]
+id              = "PH6"
+ordinal         = 6
+name            = "The Market"
+goal            = "Creators and developers earn a living inside the ecosystem, and Societies can host themselves."
+nominal_weeks   = 14
+realistic_weeks = [25, 35]
+cut_candidate   = "Society storefronts and Shelf fees"
+
+  [phase.budget]                 # 02 §5, as amended by 03 §4.1
+  services     = 2
+  api_families = 3
+  dependencies = 5               # PER DEPLOYABLE ARTIFACT (03 §4.1)
+  platforms    = 1
+  sources      = 2
+  open_adrs    = 0
+
+[[phase]]
+id              = "PH7"
+ordinal         = 7
+name            = "Experiences"
+goal            = "Societies host and govern interactive experiences."
+nominal_weeks   = 16
+realistic_weeks = [30, 40]
+cut_candidate   = "the third first-party Experience"
+
+  [phase.budget]                 # 02 §5, as amended by 03 §4.1
+  services     = 2
+  api_families = 3
+  dependencies = 5               # PER DEPLOYABLE ARTIFACT (03 §4.1)
+  platforms    = 1
+  sources      = 2
+  open_adrs    = 0
+
+[[phase]]
+id              = "PH8"
+ordinal         = 8
+name            = "FN L1"
+goal            = "The ledger migrates to a Fractal Node chain without a rewrite, proving P11."
+nominal_weeks   = 20
+realistic_weeks = [35, 50]
+cut_candidate   = "external Chain adapters"
+
+  [phase.budget]                 # 02 §5, as amended by 03 §4.1
+  services     = 2
+  api_families = 3
+  dependencies = 5               # PER DEPLOYABLE ARTIFACT (03 §4.1)
+  platforms    = 1
+  sources      = 2
+  open_adrs    = 0
+
+[[phase]]
+id              = "PH9"
+ordinal         = 9
+name            = "Exchange"
+goal            = "Fraction becomes exchangeable outside the platform, if and only if that is legal, safe, and good for the ecosystem."
+nominal_weeks   = 0            # counsel-gated; no duration is claimed
+realistic_weeks = [0, 0]
+cut_candidate   = "the entire phase - it may never open"
+
+  [phase.budget]                 # 02 §5, as amended by 03 §4.1
+  services     = 2
+  api_families = 3
+  dependencies = 5               # PER DEPLOYABLE ARTIFACT (03 §4.1)
+  platforms    = 1
+  sources      = 2
+  open_adrs    = 0
+
+# -----------------------------------------------------------------------------
+#  CAPABILITIES  -  one row per row of 03 §2. 203 total.
+# -----------------------------------------------------------------------------
+
+# -- PH0 ------------------------------------------------------------------------
+
+[[capability]]
+id        = "foundation.monorepo_layout_workspace_codeowners_licence_security"
+name      = "Monorepo layout, workspace, CODEOWNERS, licence, security policy"
+phase     = "PH0"
+owner     = "41 §2–§4"
+milestone = "M0.1"
+kind      = "feature"
+notes     = "M0.1"
+
+[[capability]]
+id        = "foundation.toolchain_pinning_rustfmt_clippy_lint_set"
+name      = "Toolchain pinning, rustfmt, clippy lint set"
+phase     = "PH0"
+owner     = "40 §2, 41 §8.2"
+milestone = "M0.2"
+kind      = "feature"
+notes     = "M0.2"
+
+[[capability]]
+id        = "foundation.the_four_canon_lints_dependency_direction"
+name      = "The four Canon lints: dependency direction, no-literal-hex, banned terminology, #[secret]"
+phase     = "PH0"
+owner     = "40 §4, 41 §7"
+milestone = "M0.2"
+kind      = "feature"
+notes     = "M0.2"
+
+[[capability]]
+id        = "foundation.cargo_xtask_phase_check_and_docs"
+name      = "cargo xtask phase-check and docs/phases.toml"
+phase     = "PH0"
+owner     = "03 §4"
+milestone = "M0.2"
+kind      = "feature"
+notes     = "New. The mechanism this file exists to enable. Must land in M0.2 with the other Canon lints"
+
+[[capability]]
+id        = "foundation.ci_fast_lane_5_min_full"
+name      = "CI fast lane <5 min, full lane, merge queue"
+phase     = "PH0"
+owner     = "40 §12, 42 §14"
+milestone = "M0.3"
+kind      = "feature"
+notes     = "M0.3"
+
+[[capability]]
+id        = "foundation.tri_target_build_x86_64_aarch64"
+name      = "Tri-target build x86_64 / aarch64 / wasm32"
+phase     = "PH0"
+owner     = "41 §8.1"
+milestone = "M0.3"
+kind      = "feature"
+notes     = "M0.3, N2"
+
+[[capability]]
+id        = "foundation.fractal_schema_codegen_openapi_protobuf_json"
+name      = "fractal-schema codegen: OpenAPI, protobuf, JSON Schema, TS client, CLI command tree"
+phase     = "PH0"
+owner     = "30 §3, 41 §12"
+milestone = "M0.4"
+kind      = "feature"
+notes     = "M0.4"
+
+[[capability]]
+id        = "foundation.codegen_diff_gate"
+name      = "codegen-diff gate"
+phase     = "PH0"
+owner     = "40 §5"
+milestone = "M0.4"
+kind      = "feature"
+notes     = "M0.4"
+
+[[capability]]
+id        = "foundation.design_token_pipeline_five_emitters_drift"
+name      = "Design token pipeline, five emitters, drift gate"
+phase     = "PH0"
+owner     = "32 §2, 41 §10.2"
+milestone = "M0.5"
+kind      = "feature"
+notes     = "M0.5, N7. Source of record is packages/tokens/src/ (§3.11 ruling)"
+
+[[capability]]
+id        = "foundation.fractal_testkit_clock_rng_idgen_fakes"
+name      = "fractal-testkit: Clock, Rng, IdGen fakes"
+phase     = "PH0"
+owner     = "40 §7.4"
+milestone = "M0.6"
+kind      = "feature"
+notes     = "M0.6"
+
+[[capability]]
+id        = "foundation.fractal_sim_deterministic_simulation_runner"
+name      = "fractal-sim deterministic simulation runner"
+phase     = "PH0"
+owner     = "40 §7.5, ADR-0014"
+milestone = "M0.6"
+kind      = "feature"
+notes     = "M0.6. 6 engineer-weeks to first value; this is the phase's long pole"
+
+[[capability]]
+id        = "foundation.first_three_11_7_invariants_as"
+name      = "First three 11 §7 invariants as property tests"
+phase     = "PH0"
+owner     = "11 §7"
+milestone = "M0.6"
+kind      = "feature"
+notes     = "M0.6"
+
+[[capability]]
+id        = "foundation.walking_skeleton_post_v1_societies_event"
+name      = "Walking skeleton: POST /v1/societies → event → projection → GET"
+phase     = "PH0"
+owner     = "30 §4.3"
+milestone = "M0.7"
+kind      = "feature"
+notes     = "M0.7"
+
+[[capability]]
+id        = "foundation.societies_resource_family_skeleton"
+name      = "societies resource family (skeleton)"
+phase     = "PH0"
+owner     = "30 §4.2"
+kind      = "api_family"
+consumes  = { api_families = 1 }
+notes     = "[api] 1 of 3. The only family PH0 claims"
+
+[[capability]]
+id        = "foundation.agents_md_working_agreement"
+name      = "AGENTS.md working agreement"
+phase     = "PH0"
+owner     = "42 §3"
+milestone = "M0.8"
+kind      = "feature"
+notes     = "M0.8"
+
+[[capability]]
+id        = "foundation.fractal_types_fractal_macros_fractal_schema"
+name      = "fractal-types, fractal-macros, fractal-schema, fractal-ports"
+phase     = "PH0"
+owner     = "41 §5.1–5.2"
+kind      = "crate"
+notes     = "[crate]"
+
+[[capability]]
+id        = "foundation.fractal_domain_society_fractal_domain_identity"
+name      = "fractal-domain-society, fractal-domain-identity"
+phase     = "PH0"
+owner     = "41 §5.3"
+kind      = "crate"
+notes     = "[crate]"
+
+[[capability]]
+id        = "foundation.fractal_app_kernel_command_bus_idempotency"
+name      = "fractal-app-kernel (command bus, idempotency, saga runner, UoW)"
+phase     = "PH0"
+owner     = "41 §5.4"
+kind      = "crate"
+notes     = "[crate]. Depends on fractal-domain-agent, which is therefore also PH0-scaffolded — see §3.21"
+
+[[capability]]
+id        = "foundation.fractal_api_gateway_fractal_api_http"
+name      = "fractal-api-gateway, fractal-api-http"
+phase     = "PH0"
+owner     = "41 §5.6"
+kind      = "crate"
+notes     = "[crate]"
+
+[[capability]]
+id        = "foundation.fractal_adapter_postgres_otel_clock"
+name      = "fractal-adapter-postgres, -otel, -clock"
+phase     = "PH0"
+owner     = "41 §5.5"
+kind      = "crate"
+notes     = "[crate]"
+
+[[capability]]
+id        = "foundation.adrs_00010014_accepted"
+name      = "ADRs 0001–0014 accepted"
+phase     = "PH0"
+owner     = "adr/"
+kind      = "adr"
+notes     = "Exit gate. 02 §5: zero open ADRs at a gate"
+
+# -- PH1 ------------------------------------------------------------------------
+
+[[capability]]
+id        = "spine.fnid_derivation_base32_encoding_checksum"
+name      = "FNID derivation, base32 encoding, checksum"
+phase     = "PH1"
+owner     = "12 §2"
+milestone = "M1.1"
+kind      = "feature"
+notes     = "M1.1"
+
+[[capability]]
+id        = "spine.handle_claim_confusable_normalization_14_day"
+name      = "Handle claim, confusable normalization, 14-day grace window (once)"
+phase     = "PH1"
+owner     = "12 §2.3, 11 §6"
+milestone = "M1.1"
+kind      = "feature"
+notes     = "M1.1. Grace ruled at §3.14"
+
+[[capability]]
+id        = "spine.passkey_registration_and_login_device_code"
+name      = "Passkey registration and login, device-code fallback"
+phase     = "PH1"
+owner     = "12 §5.1"
+milestone = "M1.1"
+kind      = "feature"
+notes     = "M1.1"
+
+[[capability]]
+id        = "spine.device_enrolment_and_the_signed_device"
+name      = "Device enrolment and the signed device chain with fork detection"
+phase     = "PH1"
+owner     = "12 §3"
+milestone = "M1.1"
+kind      = "feature"
+notes     = "M1.1"
+
+[[capability]]
+id        = "spine.sessions_dpop_token_lifetimes"
+name      = "Sessions, DPoP, token lifetimes"
+phase     = "PH1"
+owner     = "12 §5, 30 §5"
+milestone = "M1.1"
+kind      = "feature"
+notes     = "M1.1"
+
+[[capability]]
+id        = "spine.social_recovery_configuration_guardians_shamir_delay"
+name      = "Social-recovery configuration (guardians, Shamir, delay-and-notify)"
+phase     = "PH1"
+owner     = "12 §6"
+milestone = "M1.1"
+kind      = "feature"
+notes     = "M1.1"
+
+[[capability]]
+id        = "spine.second_device_as_the_primary_recovery"
+name      = "Second device as the primary recovery story, ahead of guardians"
+phase     = "PH1"
+owner     = "12 §6.1"
+kind      = "feature"
+notes     = "New. 60 §3.13 remedy 2; recovery-set formation rate becomes a PH1 acceptance criterion"
+
+[[capability]]
+id        = "spine.platform_guardian_of_last_resort_one"
+name      = "Platform guardian of last resort (one sub-threshold Shamir share)"
+phase     = "PH1"
+owner     = "12 §6.1"
+kind      = "feature"
+notes     = "New. 60 §3.13 remedy 1. Not custody under 02 §4: a single sub-threshold share under an explicit user-initiated delegation"
+
+[[capability]]
+id        = "spine.citizens_resource_family"
+name      = "citizens resource family"
+phase     = "PH1"
+owner     = "30 §4.2"
+kind      = "api_family"
+consumes  = { api_families = 1 }
+notes     = "[api] 1 of 3"
+
+[[capability]]
+id        = "spine.society_crud_charter_v0_with_roles"
+name      = "Society CRUD; Charter v0 with roles and permissions; Founder governance"
+phase     = "PH1"
+owner     = "11 §2.2–2.3"
+milestone = "M1.2"
+kind      = "feature"
+notes     = "M1.2"
+
+[[capability]]
+id        = "spine.first_hearth_society_creation_at_level"
+name      = "First-hearth Society creation at Level 0"
+phase     = "PH1"
+owner     = "18 §5.1, 11 §2.3"
+kind      = "feature"
+notes     = "Ruling §3.7. Exactly one Society per Citizen at L0, free (17 K1). The second requires L3 and 250 FRC. Without this, 50 PH1 AC-1 and the 02 §2 spine sentence are both unreachable"
+
+[[capability]]
+id        = "spine.memberships_join_policies_charter_acknowledgement"
+name      = "Memberships, join policies, Charter acknowledgement"
+phase     = "PH1"
+owner     = "11 §2.4"
+milestone = "M1.2"
+kind      = "feature"
+notes     = "M1.2"
+
+[[capability]]
+id        = "spine.chambers_text_threads_messages_reactions_edit"
+name      = "Chambers (text), Threads, Messages, reactions, edit/delete semantics"
+phase     = "PH1"
+owner     = "14 §1, 11 §2.5"
+milestone = "M1.3"
+kind      = "feature"
+notes     = "M1.3"
+
+[[capability]]
+id        = "spine.transport_encryption_presence_typing"
+name      = "Transport encryption, presence, typing"
+phase     = "PH1"
+owner     = "14 §2"
+milestone = "M1.3"
+kind      = "feature"
+notes     = "M1.3. Presence is Relay-process memory, not Redis (§3.3)"
+
+[[capability]]
+id        = "spine.chambers_threads_messages_the_discourse_family"
+name      = "chambers/threads/messages — the Discourse family"
+phase     = "PH1"
+owner     = "30 §4.2"
+kind      = "api_family"
+consumes  = { api_families = 1 }
+notes     = "[api] 2 of 3"
+
+[[capability]]
+id        = "spine.signal_websocket_subscribe_resume_backpressure_ladder"
+name      = "Signal WebSocket: subscribe, resume, backpressure ladder, replay ring, Gap semantics"
+phase     = "PH1"
+owner     = "14 §2"
+milestone = "M1.4"
+kind      = "feature"
+notes     = "M1.4. Protocol declared PH0; delivered PH1. Not a resource family (§3.1)"
+
+[[capability]]
+id        = "spine.internal_double_entry_ledger_behind_the"
+name      = "Internal double-entry ledger behind the Ledger trait"
+phase     = "PH1"
+owner     = "16 §2, 16 §4"
+milestone = "M1.5"
+kind      = "feature"
+notes     = "M1.5, N4"
+
+[[capability]]
+id        = "spine.quanta_i64_persisted_i128_intermediate_checked"
+name      = "Quanta(i64) persisted / i128 intermediate, checked arithmetic"
+phase     = "PH1"
+owner     = "17 §2.1"
+kind      = "feature"
+notes     = "Ruling §3.4. Unfixable after the first Posting"
+
+[[capability]]
+id        = "spine.citizen_society_and_agent_wallets_transfers"
+name      = "Citizen, Society and Agent Wallets; Transfers; Postings; ordered locking"
+phase     = "PH1"
+owner     = "16 §4.4, 11 §2.6"
+milestone = "M1.5"
+kind      = "feature"
+notes     = "M1.5, N5"
+
+[[capability]]
+id        = "spine.emissionaccount_sharded_into_k_64_sub"
+name      = "EmissionAccount sharded into K = 64 sub-accounts"
+phase     = "PH1"
+owner     = "16 §4.4"
+kind      = "feature"
+notes     = "New. 60 §3.6. 11 §7.4 becomes total supply == -Σ EmissionAccount[i].balance"
+
+[[capability]]
+id        = "spine.postingreason_genesisallocation"
+name      = "PostingReason::GenesisAllocation"
+phase     = "PH1"
+owner     = "17 §4"
+kind      = "feature"
+notes     = "Ruling §3.8. Bounded, published, non-Source. Retired at the PH4 exit gate. consumes no 02 §5 Source budget slot"
+
+[[capability]]
+id        = "spine.continuous_ledger_reconciler_with_freeze_on"
+name      = "Continuous ledger reconciler with freeze-on-divergence"
+phase     = "PH1"
+owner     = "16 §4.5"
+milestone = "M1.5"
+kind      = "feature"
+notes     = "M1.5"
+
+[[capability]]
+id        = "spine.wallets_transfers_postings_the_ledger_family"
+name      = "wallets/transfers/postings — the Ledger family"
+phase     = "PH1"
+owner     = "30 §4.2"
+kind      = "api_family"
+consumes  = { api_families = 1 }
+notes     = "[api] 3 of 3. PH1 is now exactly at budget"
+
+[[capability]]
+id        = "spine.xp_levels_012_the_level_curve"
+name      = "XP, Levels 0–12, the level curve"
+phase     = "PH1"
+owner     = "18 §3–§4"
+milestone = "M1.6"
+kind      = "feature"
+notes     = "M1.6. Overrides 41 §5.3, which places fractal-domain-progression at PH2"
+
+[[capability]]
+id        = "spine.trust_standing_the_first_unlock_gates"
+name      = "Trust, Standing, the first Unlock gates, ContributionReceipt"
+phase     = "PH1"
+owner     = "18 §2, 18 §5"
+milestone = "M1.6"
+kind      = "feature"
+notes     = "M1.6. ContributionReceipt renders XP only until PH5 brings S4"
+
+[[capability]]
+id        = "spine.progression_api_under_v1_citizens_id"
+name      = "Progression API under /v1/citizens/{id}/progression"
+phase     = "PH1"
+owner     = "30 §4.2"
+kind      = "feature"
+notes     = "Not a resource family — a sub-resource of citizens (§3.1)"
+
+[[capability]]
+id        = "spine.lattice_design_system_tokens_40_components"
+name      = "LATTICE design system: tokens, 40 components, nine artifacts each, Storybook, visual regression"
+phase     = "PH1"
+owner     = "32, 51 §14.1"
+milestone = "M1.7"
+kind      = "feature"
+notes     = "M1.7. The critical path; start day one"
+
+[[capability]]
+id        = "spine.themes_void_and_contrast"
+name      = "Themes void and contrast"
+phase     = "PH1"
+owner     = "32 §9"
+kind      = "feature"
+notes     = "daylight is PH2 (51 Q5). Names ruled at §3.11"
+
+[[capability]]
+id        = "spine.web_gui_society_shell_chamber_wallet"
+name      = "Web GUI: Society shell, Chamber, Wallet, Profile, onboarding, command palette, four data states"
+phase     = "PH1"
+owner     = "51 §4–§5"
+milestone = "M1.8"
+kind      = "feature"
+notes     = "M1.8"
+
+[[capability]]
+id        = "spine.web_client_platform"
+name      = "Web client platform"
+phase     = "PH1"
+owner     = "34 §4"
+kind      = "platform"
+consumes  = { platforms = 1 }
+notes     = "[plat] 1 of 1"
+
+[[capability]]
+id        = "spine.no_wasm_core_no_service_worker"
+name      = "No wasm core, no Service Worker, no PWA in PH1"
+phase     = "PH1"
+owner     = "51 §2.2 R3/R8"
+kind      = "feature"
+notes     = "Ruled in 51; restated here because three chapters imply otherwise"
+
+[[capability]]
+id        = "spine.cli_v1_with_full_gui_parity"
+name      = "CLI v1 with full GUI parity, generated command tree, boot sequence, Society dashboard"
+phase     = "PH1"
+owner     = "31"
+milestone = "M1.9"
+kind      = "feature"
+notes     = "M1.9, N3, P13"
+
+[[capability]]
+id        = "spine.opentelemetry_end_to_end_slos_dashboards"
+name      = "OpenTelemetry end to end, SLOs, dashboards, alerting, runbook per alert"
+phase     = "PH1"
+owner     = "40 §9–§10"
+milestone = "M1.10"
+kind      = "feature"
+notes     = "M1.10"
+
+[[capability]]
+id        = "spine.backups_with_a_restore_drill_incident"
+name      = "Backups with a restore drill, incident procedure, abuse reporting, ToS/privacy, staged rollout"
+phase     = "PH1"
+owner     = "40 §11, 50 M1.11"
+milestone = "M1.11"
+kind      = "feature"
+notes     = "M1.11"
+
+[[capability]]
+id        = "spine.safety_operations_model_report_volume_projection"
+name      = "Safety operations model: report volume projection, review staffing, appeal SLO, reviewer welfare"
+phase     = "PH1"
+owner     = "14 §6, 50 §3"
+kind      = "feature"
+notes     = "New. 60 §3.15 remedy 2. A PH1 exit criterion, because PH1 is when external Citizens arrive"
+
+[[capability]]
+id        = "spine.shardrouter_in_the_composition_root_one"
+name      = "ShardRouter in the composition root, one shard configured"
+phase     = "PH1"
+owner     = "10 §12"
+kind      = "feature"
+notes     = "New. §3.6. The seam must exist and be exercised before it is needed"
+
+[[capability]]
+id        = "spine.s15_atlas_unified_inbox_in_society"
+name      = "S15 Atlas: unified inbox, in-Society search feed, Shard refcount skeleton"
+phase     = "PH1"
+owner     = "10 §3, 41 §5.4"
+kind      = "crate"
+notes     = "New boundary, §3.9. [crate] fractal-app-atlas. No new [api] family, no new [svc]"
+
+[[capability]]
+id        = "spine.in_society_scoped_search_over_the"
+name      = "In-Society scoped search over the Discourse projection"
+phase     = "PH1"
+owner     = "51 Q8"
+kind      = "feature"
+notes     = "Global search is PH5 with the Discovery family"
+
+[[capability]]
+id        = "spine.fractal_domain_discourse_ledger_progression_governance"
+name      = "fractal-domain-discourse, -ledger, -progression, -governance, -agent (CapabilitySet only)"
+phase     = "PH1"
+owner     = "41 §5.3"
+kind      = "crate"
+notes     = "[crate]. Overrides 41 §5.3's PH2 for progression, governance and agent"
+
+[[capability]]
+id        = "spine.fractal_adapter_ledger_internal_chain_null"
+name      = "fractal-adapter-ledger-internal, -chain-null, -nats, -ws, -keystore-os, -rail-internal"
+phase     = "PH1"
+owner     = "41 §5.5"
+kind      = "crate"
+notes     = "[crate]. Overrides 41 §5.5, which places -rail-internal at PH2; 16 §9 is right"
+
+[[capability]]
+id        = "spine.fractal_app_projection_with_the_replay"
+name      = "fractal-app-projection with the replay driver"
+phase     = "PH1"
+owner     = "41 §5.4"
+kind      = "crate"
+notes     = "[crate]"
+
+[[capability]]
+id        = "spine.per_projection_checkpoints_generalized_from_16"
+name      = "Per-projection checkpoints (generalized from 16 §4.3)"
+phase     = "PH1"
+owner     = "16 §4.3"
+kind      = "feature"
+notes     = "New. 60 §3.5. Cheap now, a 5-to-37-hour outage later"
+
+[[capability]]
+id        = "spine.runtime_as_the_first_top_level"
+name      = "Runtime as the first top-level service"
+phase     = "PH1"
+owner     = "10 §2"
+kind      = "service"
+consumes  = { services = 1 }
+notes     = "[svc] 1 of 2"
+
+[[capability]]
+id        = "spine.openmls_spike_at_1_000_leaves"
+name      = "OpenMLS spike at 1,000 leaves on real hardware"
+phase     = "PH1"
+owner     = "ADR-0010"
+kind      = "feature"
+notes     = "New. 60 I16. Moves the 10 §12 fallback decision off PH2's critical path"
+
+[[capability]]
+id        = "spine.economy_rates_toml_as_the_single"
+name      = "economy/rates.toml as the single economic rate table"
+phase     = "PH1"
+owner     = "17 §3, 13 §8.2"
+kind      = "feature"
+notes     = "New. §3.20 ruling; generates 13 §8.2 and 18 §5.1/§5.2"
+
+# -- PH2 ------------------------------------------------------------------------
+
+[[capability]]
+id        = "node.fractal_core_client_core_local_sqlite"
+name      = "fractal-core client core: local SQLite store, replicated log, outbox, sync_step(budget)"
+phase     = "PH2"
+owner     = "34 §2, 41 §5.7"
+milestone = "M2.1"
+kind      = "feature"
+notes     = "M2.1"
+
+[[capability]]
+id        = "node.fractal_core_wasm_and_the_opfs"
+name      = "fractal-core-wasm and the OPFS-backed browser replica"
+phase     = "PH2"
+owner     = "34 §4.2"
+milestone = "M2.1"
+kind      = "feature"
+notes     = "M2.1. 34 §4.2 is corrected from PH1 (51 R3)"
+
+[[capability]]
+id        = "node.conflict_policy_per_data_class_crdts"
+name      = "Conflict policy per data class; CRDTs for reactions, read state, presence"
+phase     = "PH2"
+owner     = "10 §6"
+milestone = "M2.2"
+kind      = "feature"
+notes     = "M2.2"
+
+[[capability]]
+id        = "node.offline_ux_staleness_indicators_queued_write"
+name      = "Offline UX: staleness indicators, queued-write rendering, reconciliation surfacing"
+phase     = "PH2"
+owner     = "32 §6"
+milestone = "M2.3"
+kind      = "feature"
+notes     = "M2.3"
+
+[[capability]]
+id        = "node.desktop_node_windows_tauri_v2_shell"
+name      = "Desktop Node (Windows): Tauri v2 shell, installer, signed differential updates, tray, deep links"
+phase     = "PH2"
+owner     = "34 §5"
+milestone = "M2.4"
+kind      = "feature"
+notes     = "M2.4"
+
+[[capability]]
+id        = "node.desktop_client_platform"
+name      = "Desktop client platform"
+phase     = "PH2"
+owner     = "34 §5"
+kind      = "platform"
+consumes  = { platforms = 1 }
+notes     = "[plat] 1 of 1"
+
+[[capability]]
+id        = "node.six_breakpoints_density_modes_the_88ch"
+name      = "Six breakpoints, density modes, the 88ch measure invariant, gamepad focus navigation"
+phase     = "PH2"
+owner     = "32 §4.2"
+milestone = "M2.5"
+kind      = "feature"
+notes     = "M2.5. 60 §3.11's designated PH1 cut candidate lands here"
+
+[[capability]]
+id        = "node.vault_v1_objects_versions_acls_upload"
+name      = "Vault v1: Objects, Versions, ACLs, upload/download, quotas"
+phase     = "PH2"
+owner     = "13 §3, 13 §10.1"
+milestone = "M2.6"
+kind      = "feature"
+notes     = "M2.6"
+
+[[capability]]
+id        = "node.citizen_vault_vault_society_option_societyid"
+name      = "Citizen Vault (Vault.society: Option<SocietyId>)"
+phase     = "PH2"
+owner     = "11 §2.7, 21 §17"
+kind      = "feature"
+notes     = "Ruling §3.10. The Canon amendment lands in PH1; the first Citizen Vault Object is written in PH2"
+
+[[capability]]
+id        = "node.blobstore_on_s3_compatible_storage"
+name      = "BlobStore on S3-compatible storage"
+phase     = "PH2"
+owner     = "13 §11.3"
+milestone = "M2.6"
+kind      = "feature"
+notes     = "M2.6"
+
+[[capability]]
+id        = "node.vault_objects_vault_manifests_the_vault"
+name      = "vault/objects/vault/manifests — the Vault family"
+phase     = "PH2"
+owner     = "30 §4.2"
+kind      = "api_family"
+consumes  = { api_families = 1 }
+notes     = "[api] 1 of 3. Overrides 30 §4.2, which places it at PH1"
+
+[[capability]]
+id        = "node.v1_subscriptions_durable_signal_subscriptions"
+name      = "/v1/subscriptions — durable Signal subscriptions"
+phase     = "PH2"
+owner     = "30 §4.2"
+kind      = "api_family"
+consumes  = { api_families = 1 }
+notes     = "[api] 2 of 3"
+
+[[capability]]
+id        = "node.media_pipeline_transcoding_ladder_av1_avif"
+name      = "Media pipeline: transcoding ladder, AV1/AVIF/Opus with fallbacks, thumbnails, blurhash"
+phase     = "PH2"
+owner     = "13 §9"
+milestone = "M2.7"
+kind      = "feature"
+notes     = "M2.7"
+
+[[capability]]
+id        = "node.transcoder_service"
+name      = "Transcoder service"
+phase     = "PH2"
+owner     = "10 §2 ①"
+kind      = "service"
+consumes  = { services = 1 }
+notes     = "[svc] 1 of 2"
+
+[[capability]]
+id        = "node.fractal_adapter_ffmpeg"
+name      = "fractal-adapter-ffmpeg"
+phase     = "PH2"
+owner     = "41 §5.5"
+milestone = "M2.7"
+kind      = "crate"
+notes     = "[crate]. Overrides 41 §5.5's PH4; 50 M2.7 calls this the first extraction"
+
+[[capability]]
+id        = "node.adaptive_playback_with_verified_streaming"
+name      = "Adaptive playback with verified streaming"
+phase     = "PH2"
+owner     = "13 §5"
+milestone = "M2.7"
+kind      = "feature"
+notes     = "M2.7"
+
+[[capability]]
+id        = "node.gallery_chambers_the_module_grid_the"
+name      = "Gallery Chambers, the Module grid, the customization contract, save-time a11y validation"
+phase     = "PH2"
+owner     = "21 §3, 21 §5"
+milestone = "M2.8"
+kind      = "feature"
+notes     = "M2.8"
+
+[[capability]]
+id        = "node.personal_collections_viewer_exif_handling_offline"
+name      = "Personal Collections, viewer, EXIF handling, offline pin"
+phase     = "PH2"
+owner     = "21 §5"
+milestone = "M2.8"
+kind      = "feature"
+notes     = "M2.8"
+
+[[capability]]
+id        = "node.pwa_installable_offline_capable_push_share"
+name      = "PWA: installable, offline-capable, push, share target"
+phase     = "PH2"
+owner     = "34 §4.3"
+milestone = "M2.9"
+kind      = "feature"
+notes     = "M2.9. 34 §4.3's \"Phase 3\" is corrected (51 Q4)"
+
+[[capability]]
+id        = "node.e2ee_for_dms_and_private_chambers"
+name      = "E2EE for DMs and Private Chambers via MLS"
+phase     = "PH2"
+owner     = "14 §4"
+milestone = "M2.10"
+kind      = "feature"
+notes     = "M2.10"
+
+[[capability]]
+id        = "node.mls_ceiling_in_ph2_500_leaves"
+name      = "MLS ceiling in PH2: 500 leaves (≈200 Citizens at 2.5 devices/Citizen)"
+phase     = "PH2"
+owner     = "14 §4.4"
+kind      = "feature"
+notes     = "Ruling §3.12. Every MLS figure is now stated in leaves"
+
+[[capability]]
+id        = "node.historykey_wrapped_separately_from_the_identity"
+name      = "HistoryKey wrapped separately from the identity recovery key, off by default"
+phase     = "PH2"
+owner     = "12 §6.3, 14 §4.5"
+kind      = "feature"
+notes     = "New. 60 §3.7. Adds I-12.13"
+
+[[capability]]
+id        = "node.fractal_adapter_mls_model_http"
+name      = "fractal-adapter-mls, -model-http"
+phase     = "PH2"
+owner     = "41 §5.5"
+kind      = "crate"
+notes     = "[crate]"
+
+[[capability]]
+id        = "node.fractal_domain_vault_economy"
+name      = "fractal-domain-vault, -economy"
+phase     = "PH2"
+owner     = "41 §5.3"
+kind      = "crate"
+notes     = "[crate]. -economy holds settlement arithmetic; no Source emits until PH4"
+
+[[capability]]
+id        = "node.two_primary_composition_root_proof_the"
+name      = "Two-primary composition-root proof (the EventStore shard rehearsal)"
+phase     = "PH2"
+owner     = "10 §12"
+kind      = "feature"
+notes     = "New. 60 I14. §3.6"
+
+[[capability]]
+id        = "node.projection_rebuild_slo_any_projection_any"
+name      = "Projection rebuild SLO: any projection, any Society, ≤ 15 min at p99"
+phase     = "PH2"
+owner     = "40 §9.4"
+kind      = "feature"
+notes     = "New. 60 §3.5. A PH2 gate criterion with a large-Society fixture"
+
+[[capability]]
+id        = "node.internal_anchoring_and_the_standalone_verifier"
+name      = "Internal anchoring and the standalone verifier"
+phase     = "PH2"
+owner     = "16 §6"
+milestone = "M2.11"
+kind      = "feature"
+notes     = "Matches 16 §20. 50 PH2 gains a milestone for it (M2.11)"
+
+[[capability]]
+id        = "node.daylight_theme"
+name      = "daylight theme"
+phase     = "PH2"
+owner     = "32 §9"
+kind      = "feature"
+notes     = "Deferred from PH1 per 51 Q5"
+
+# -- PH3 ------------------------------------------------------------------------
+
+[[capability]]
+id        = "agent.capability_grammar_capabilityset_algebra_attenuation_only"
+name      = "Capability grammar, CapabilitySet algebra, attenuation-only grants, TTLs"
+phase     = "PH3"
+owner     = "12 §7, 15 §4"
+milestone = "M3.1"
+kind      = "feature"
+notes     = "M3.1. The lattice itself lands PH1 for Charter roles"
+
+[[capability]]
+id        = "agent.envelope_revocation_with_in_flight_semantics"
+name      = "Envelope revocation with in-flight semantics"
+phase     = "PH3"
+owner     = "12 §7.3"
+milestone = "M3.1"
+kind      = "feature"
+notes     = "M3.1"
+
+[[capability]]
+id        = "agent.policy_enforcement_point_in_the_application"
+name      = "Policy Enforcement Point in the application layer, envelope_ref on every event"
+phase     = "PH3"
+owner     = "10 §8, 15 §5"
+milestone = "M3.2"
+kind      = "feature"
+notes     = "M3.2. Server-only — never in wasm (§3.2)"
+
+[[capability]]
+id        = "agent.agentactionblocked_as_a_domain_event"
+name      = "AgentActionBlocked as a domain event"
+phase     = "PH3"
+owner     = "10 §8"
+milestone = "M3.2"
+kind      = "feature"
+notes     = "M3.2"
+
+[[capability]]
+id        = "agent.agent_identity_operator_accountability_execution_loop"
+name      = "Agent identity, Operator accountability, execution loop, sandboxing, metering, checkpointing"
+phase     = "PH3"
+owner     = "15 §2–§3"
+milestone = "M3.3"
+kind      = "feature"
+notes     = "M3.3"
+
+[[capability]]
+id        = "agent.modelprovider_port_hosted_and_local_adapters"
+name      = "ModelProvider port, hosted and local adapters, per-Society model choice, ContextManifest"
+phase     = "PH3"
+owner     = "15 §9"
+milestone = "M3.4"
+kind      = "feature"
+notes     = "M3.4"
+
+[[capability]]
+id        = "agent.offline_agent_semantics_inference_refused_without"
+name      = "Offline Agent semantics: inference refused without a local provider; authorization always deferred"
+phase     = "PH3"
+owner     = "15 §6, 34 §12.1"
+kind      = "feature"
+notes     = "Ruling §3.13. Both statements are true and differently scoped"
+
+[[capability]]
+id        = "agent.workflows_declarative_graph_triggers_steps_conditions"
+name      = "Workflows: declarative graph, triggers, steps, conditions, compensation, versioning"
+phase     = "PH3"
+owner     = "15 §7–§8"
+milestone = "M3.5"
+kind      = "feature"
+notes     = "M3.5"
+
+[[capability]]
+id        = "agent.three_first_party_workflows"
+name      = "Three first-party Workflows"
+phase     = "PH3"
+owner     = "15 §8"
+milestone = "M3.5"
+kind      = "feature"
+notes     = "M3.5"
+
+[[capability]]
+id        = "agent.extension_host_wasm_component_model_wit"
+name      = "Extension host: WASM Component Model, WIT world, manifest, install/consent, resource limits"
+phase     = "PH3"
+owner     = "20 §4"
+milestone = "M3.6"
+kind      = "feature"
+notes     = "M3.6"
+
+[[capability]]
+id        = "agent.extension_kinds_plugin_theme_template_sdk"
+name      = "Extension kinds plugin, theme, template, sdk, workflow"
+phase     = "PH3"
+owner     = "20 §2"
+milestone = "M3.5"
+kind      = "feature"
+notes     = "Ruling §3.15. 20 §2 places workflow at PH4; 50 M3.5 ships the graph in PH3"
+
+# -- PH4 ------------------------------------------------------------------------
+
+[[capability]]
+id        = "mesh.extension_kind_automation_pack"
+name      = "Extension kind automation-pack"
+phase     = "PH4"
+owner     = "20 §2"
+kind      = "feature"
+notes     = "Bundles Policy proposals; needs Governance v1 settled for a phase"
+
+# -- PH3 ------------------------------------------------------------------------
+
+[[capability]]
+id        = "agent.ten_first_party_extensions_on_the"
+name      = "Ten first-party Extensions on the public hook surface"
+phase     = "PH3"
+owner     = "20 §2"
+milestone = "M3.7"
+kind      = "feature"
+notes     = "M3.7, P7"
+
+[[capability]]
+id        = "agent.extension_supplied_tool_definitions_treated_as"
+name      = "Extension-supplied tool definitions treated as untrusted content, host-namespaced ext.<install_id>.<name>"
+phase     = "PH3"
+owner     = "15 §13.1, 20 §6"
+kind      = "feature"
+notes     = "New. 60 §3.8. Adds A11"
+
+[[capability]]
+id        = "agent.per_install_fee_revenue_ceiling_and"
+name      = "Per-Install fee-revenue ceiling and host-drawn fee disclosure for hook 18"
+phase     = "PH3"
+owner     = "20 §11"
+kind      = "feature"
+notes     = "New. 60 §3.8"
+
+[[capability]]
+id        = "agent.governance_v1_charter_amendment_council_governance"
+name      = "Governance v1: Charter amendment, Council governance, roles beyond Founder, moderation actions, appeals"
+phase     = "PH3"
+owner     = "11 §2.3, 19 §5.5"
+milestone = "M3.8"
+kind      = "feature"
+notes     = "M3.8. Overrides 41 §5.3, which places fractal-domain-governance at PH2"
+
+[[capability]]
+id        = "agent.agent_surfaces_envelopecard_policyeditor_audit_trail"
+name      = "Agent surfaces: EnvelopeCard, PolicyEditor, audit trail, Operator and Society kill switches"
+phase     = "PH3"
+owner     = "15 §11"
+milestone = "M3.9"
+kind      = "feature"
+notes     = "M3.9"
+
+[[capability]]
+id        = "agent.agents_envelopes_policies_workflows_runs_the"
+name      = "agents/envelopes/policies/workflows/runs — the Agent family"
+phase     = "PH3"
+owner     = "30 §4.2"
+kind      = "api_family"
+consumes  = { api_families = 1 }
+notes     = "[api] 1 of 3. Overrides 30 §4.2's PH1"
+
+[[capability]]
+id        = "agent.extensions_installs_the_extension_family"
+name      = "extensions/installs — the Extension family"
+phase     = "PH3"
+owner     = "30 §4.2"
+kind      = "api_family"
+consumes  = { api_families = 1 }
+notes     = "[api] 2 of 3"
+
+[[capability]]
+id        = "agent.charter_versions_proposals_votes_moderation_the"
+name      = "charter/versions/proposals/votes/moderation — the Governance family"
+phase     = "PH3"
+owner     = "30 §4.2"
+kind      = "api_family"
+consumes  = { api_families = 1 }
+notes     = "[api] 3 of 3. PH3 is exactly at budget; Asset moves to PH4"
+
+[[capability]]
+id        = "agent.agent_executor_service"
+name      = "Agent Executor service"
+phase     = "PH3"
+owner     = "10 §2 ③"
+kind      = "service"
+consumes  = { services = 1 }
+notes     = "[svc] 1 of 2"
+
+[[capability]]
+id        = "agent.fractal_domain_extension_fractal_adapter_wasmtime"
+name      = "fractal-domain-extension, fractal-adapter-wasmtime"
+phase     = "PH3"
+owner     = "41 §5.5"
+kind      = "crate"
+notes     = "[crate]"
+
+[[capability]]
+id        = "agent.sandbox_port_adr"
+name      = "Sandbox port ADR"
+phase     = "PH3"
+owner     = "20 §4, 41 §5.5"
+kind      = "feature"
+notes     = "Required before the crate leaves unstable-sandbox"
+
+[[capability]]
+id        = "agent.external_security_audit_of_the_envelope"
+name      = "External security audit of the Envelope and Extension sandbox"
+phase     = "PH3"
+owner     = "50 PH3"
+kind      = "feature"
+notes     = "Exit gate. Non-negotiable"
+
+# -- PH4 ------------------------------------------------------------------------
+
+[[capability]]
+id        = "mesh.custodian_registration_capacity_commitment_graceful_exit"
+name      = "Custodian registration, capacity commitment, graceful exit"
+phase     = "PH4"
+owner     = "13 §7.4"
+milestone = "M4.1"
+kind      = "feature"
+notes     = "M4.1"
+
+[[capability]]
+id        = "mesh.custodian_eligibility_decoupled_from_level_trust"
+name      = "Custodian eligibility decoupled from Level: Trust ≥ 100 ∧ proof-of-capacity ∧ bond ∧ 30-day probation"
+phase     = "PH4"
+owner     = "13 §7.4, 18 §5.5"
+kind      = "feature"
+notes     = "Ruling §3.16. 18 §5.5's Level ≥ 8 ∧ Stake(500 FRC) is deleted"
+
+[[capability]]
+id        = "mesh.bond_scaled_by_committed_bytes_bond"
+name      = "Bond scaled by committed bytes (bond_rate × committed_bytes, floor 500 FRC)"
+phase     = "PH4"
+owner     = "13 §7.4"
+kind      = "feature"
+notes     = "Ruling §3.16. Resolves X13"
+
+[[capability]]
+id        = "mesh.shard_assignment_by_xor_distance_rendezvous"
+name      = "Shard assignment by XOR distance; rendezvous hashing over a bucketed index"
+phase     = "PH4"
+owner     = "13 §7.2"
+kind      = "feature"
+notes     = "60 I19: two days now, a rewrite at 10 k Custodians"
+
+[[capability]]
+id        = "mesh.attestation_challenge_scheme_proof_verification_failure"
+name      = "Attestation: challenge scheme, proof verification, failure handling, slashing"
+phase     = "PH4"
+owner     = "13 §7.5–§7.6"
+milestone = "M4.2"
+kind      = "feature"
+notes     = "M4.2"
+
+[[capability]]
+id        = "mesh.rs_10_16_erasure_coding_placement"
+name      = "RS(10,16) erasure coding, placement across failure domains, repair triggers"
+phase     = "PH4"
+owner     = "13 §6"
+milestone = "M4.3"
+kind      = "feature"
+notes     = "M4.3. 1.60× is the replication factor in every model (§3.6)"
+
+[[capability]]
+id        = "mesh.blobstore_swap_to_the_custodian_mesh"
+name      = "BlobStore swap to the Custodian mesh, dual-write, 30-day verification, cutover with rollback"
+phase     = "PH4"
+owner     = "13 §11.4"
+milestone = "M4.4"
+kind      = "feature"
+notes     = "M4.4"
+
+[[capability]]
+id        = "mesh.measured_ph4_entry_precondition_committed_capacity"
+name      = "Measured PH4 entry precondition: committed capacity ≥ 3× current logical storage across ≥ 8 failure domains"
+phase     = "PH4"
+owner     = "13 §11.4"
+kind      = "feature"
+notes     = "New. 60 §3.14. Gates step 4.1"
+
+[[capability]]
+id        = "mesh.s1_storage_custody"
+name      = "S1 — Storage Custody"
+phase     = "PH4"
+owner     = "17 §3.2"
+kind      = "source"
+consumes  = { sources = 1 }
+notes     = "[src] 1 of 2. 0.28 FRC/replica-GB-month, sink-first"
+
+[[capability]]
+id        = "mesh.s2_bandwidth_service"
+name      = "S2 — Bandwidth Service"
+phase     = "PH4"
+owner     = "17 §3.2"
+kind      = "source"
+consumes  = { sources = 1 }
+notes     = "[src] 2 of 2. PH4 is exactly at the Source budget"
+
+[[capability]]
+id        = "mesh.settlement_windows_offset_by_blake3_society"
+name      = "Settlement windows offset by BLAKE3(society_id) mod 86400"
+phase     = "PH4"
+owner     = "13 §8.2"
+kind      = "feature"
+notes     = "New. 60 §3.6. Removes the 00:00 UTC spike"
+
+[[capability]]
+id        = "mesh.emission_ledger_published_public_supply_dashboard"
+name      = "Emission ledger published; public supply dashboard"
+phase     = "PH4"
+owner     = "17 §5, 17 §11"
+milestone = "M4.6"
+kind      = "feature"
+notes     = "M4.6"
+
+[[capability]]
+id        = "mesh.genesisallocation_retired"
+name      = "GenesisAllocation retired"
+phase     = "PH4"
+owner     = "17 §4"
+kind      = "feature"
+notes     = "Ruling §3.8. Stops at the PH4 exit gate; the enum variant survives forever"
+
+[[capability]]
+id        = "mesh.sinks_k8_storage_tariff_k9_bandwidth"
+name      = "Sinks K8 (storage tariff), K9 (bandwidth tariff), K13 (stake slash), K16 (vesting forfeiture)"
+phase     = "PH4"
+owner     = "17 §4"
+kind      = "sink"
+notes     = "[snk] — Sinks consume no 02 §5 budget line"
+
+[[capability]]
+id        = "mesh.sources_settlements_contribution_the_economy_family"
+name      = "sources/settlements/contribution — the Economy family"
+phase     = "PH4"
+owner     = "30 §4.2"
+kind      = "api_family"
+consumes  = { api_families = 1 }
+notes     = "[api] 1 of 3"
+
+[[capability]]
+id        = "mesh.facets_facet_standards_the_asset_family"
+name      = "facets/facet-standards — the Asset family"
+phase     = "PH4"
+owner     = "30 §4.2"
+milestone = "M4.11"
+kind      = "api_family"
+consumes  = { api_families = 1 }
+notes     = "[api] 2 of 3. Moved from PH3 (§3.17); 50 gains milestone M4.11"
+
+[[capability]]
+id        = "mesh.fn_asset_1_core_mint_state"
+name      = "FN-ASSET/1 core: mint, state, provenance, transfer; Deterministic and Owner evolution triggers"
+phase     = "PH4"
+owner     = "16 §11"
+milestone = "M4.11"
+kind      = "feature"
+notes     = "M4.11. Overrides 16 §20's PH3 — 50 has no PH3 asset milestone"
+
+[[capability]]
+id        = "mesh.insignia_and_badges_rendered_as_facets"
+name      = "Insignia and Badges rendered as Facets, minted retroactively from the progression log"
+phase     = "PH4"
+owner     = "18 §5.4"
+kind      = "feature"
+notes     = "The Facet evolution model carries the tier provenance; PH1–PH3 Achievements are progression records"
+
+[[capability]]
+id        = "mesh.voice_webrtc_sfu_voice_chambers_jitter"
+name      = "Voice: WebRTC + SFU, Voice Chambers, jitter/echo handling, SFrame E2EE media"
+phase     = "PH4"
+owner     = "14 §7"
+milestone = "M4.7"
+kind      = "feature"
+notes     = "M4.7"
+
+[[capability]]
+id        = "mesh.video_and_stage_simulcast_svc_stage"
+name      = "Video and Stage: simulcast/SVC, Stage Chamber, recording with consent"
+phase     = "PH4"
+owner     = "14 §7"
+milestone = "M4.8"
+kind      = "feature"
+notes     = "M4.8"
+
+[[capability]]
+id        = "mesh.sfu_extracted_relay_service"
+name      = "SFU / extracted Relay service"
+phase     = "PH4"
+owner     = "10 §2 ②"
+kind      = "service"
+consumes  = { services = 1 }
+notes     = "[svc] 1 of 2"
+
+[[capability]]
+id        = "mesh.custodian_coordinator_service"
+name      = "Custodian Coordinator service"
+phase     = "PH4"
+owner     = "10 §2 ⑤"
+kind      = "service"
+consumes  = { services = 1 }
+notes     = "[svc] 2 of 2. PH4 is exactly at the service budget"
+
+[[capability]]
+id        = "mesh.convergence_serendipity_eligibility_crystallization_with_full"
+name      = "Convergence, Serendipity, eligibility, Crystallization with full history preservation"
+phase     = "PH4"
+owner     = "11 §2.10, 11 §3.1"
+milestone = "M4.9"
+kind      = "feature"
+notes     = "M4.9. /v1/convergences is in the Discourse family"
+
+[[capability]]
+id        = "mesh.mls_ceiling_raised_to_1_000"
+name      = "MLS ceiling raised to 1,000 leaves (≈400 Citizens)"
+phase     = "PH4"
+owner     = "14 §4.4"
+kind      = "feature"
+notes     = "Ruling §3.12"
+
+[[capability]]
+id        = "mesh.fractal_adapter_tantivy_fractal_api_grpc"
+name      = "fractal-adapter-tantivy, fractal-api-grpc"
+phase     = "PH4"
+owner     = "41 §5.5–5.6"
+kind      = "crate"
+notes     = "[crate]"
+
+[[capability]]
+id        = "mesh.locally_repairable_codes_adr_if_repair"
+name      = "Locally-repairable codes ADR, if repair egress exceeds 40% of mesh egress"
+phase     = "PH4"
+owner     = "13 §15"
+kind      = "feature"
+notes     = "60 I30's measured trigger"
+
+# -- PH5 ------------------------------------------------------------------------
+
+[[capability]]
+id        = "fracture.governance_v2_proposals_voting_quorum_threshold"
+name      = "Governance v2: proposals, voting, quorum/threshold, delegation, fracture_rules"
+phase     = "PH5"
+owner     = "11 §2.3"
+milestone = "M5.1"
+kind      = "feature"
+notes     = "M5.1"
+
+[[capability]]
+id        = "fracture.fracture_dry_run_full_simulation_diff"
+name      = "Fracture dry run: full simulation, diff report, invariant checking, dry_run_token"
+phase     = "PH5"
+owner     = "11 §3.2"
+milestone = "M5.2"
+kind      = "feature"
+notes     = "M5.2. Mandatory"
+
+[[capability]]
+id        = "fracture.fracture_execution_log_sealing_child_genesis"
+name      = "Fracture execution: log sealing, child genesis, treasury division, Vault re-referencing, resumability"
+phase     = "PH5"
+owner     = "11 §3.2"
+milestone = "M5.3"
+kind      = "feature"
+notes     = "M5.3"
+
+[[capability]]
+id        = "fracture.content_key_rotation_on_fracture_vaultkeyrotatedonfracture"
+name      = "Content-key rotation on Fracture (VaultKeyRotatedOnFracture)"
+phase     = "PH5"
+owner     = "11 §3.2, 13 §10.1"
+kind      = "feature"
+notes     = "New, ruling §3.5. Sixth Fracture invariant (11 §7.16); tested in 50 PH5 AC-1"
+
+[[capability]]
+id        = "fracture.fork_and_dissolution"
+name      = "Fork and Dissolution"
+phase     = "PH5"
+owner     = "11 §3.3"
+milestone = "M5.4"
+kind      = "feature"
+notes     = "M5.4"
+
+[[capability]]
+id        = "fracture.lineage_ancestry_graph_cross_generation_history"
+name      = "Lineage: ancestry graph, cross-generation history readability"
+phase     = "PH5"
+owner     = "11 §2.2"
+milestone = "M5.5"
+kind      = "feature"
+notes     = "M5.5"
+
+[[capability]]
+id        = "fracture.android_native_shell_over_uniffi"
+name      = "Android native shell over UniFFI"
+phase     = "PH5"
+owner     = "34 §7"
+milestone = "M5.6"
+kind      = "feature"
+notes     = "M5.6"
+
+[[capability]]
+id        = "fracture.ios_native_shell"
+name      = "iOS native shell"
+phase     = "PH5"
+owner     = "34 §7"
+milestone = "M5.7"
+kind      = "feature"
+notes     = "M5.7"
+
+[[capability]]
+id        = "fracture.mobile_client_platform_one_decision_executed"
+name      = "Mobile client platform (one decision executed twice)"
+phase     = "PH5"
+owner     = "34 §7"
+kind      = "platform"
+consumes  = { platforms = 1 }
+notes     = "[plat] 1 of 1"
+
+[[capability]]
+id        = "fracture.macos_and_linux_desktop_builds"
+name      = "macOS and Linux desktop builds"
+phase     = "PH5"
+owner     = "34 §5"
+milestone = "M5.8"
+kind      = "feature"
+notes     = "M5.8. Build targets, not platforms"
+
+[[capability]]
+id        = "fracture.advanced_discovery_interest_graph_matching_on"
+name      = "Advanced discovery: interest graph, matching on declared signals, Society discovery"
+phase     = "PH5"
+owner     = "14 §8"
+milestone = "M5.9"
+kind      = "feature"
+notes     = "M5.9"
+
+[[capability]]
+id        = "fracture.search_discovery_interests_the_discovery_family"
+name      = "search/discovery/interests — the Discovery family"
+phase     = "PH5"
+owner     = "30 §4.2"
+kind      = "api_family"
+consumes  = { api_families = 1 }
+notes     = "[api] 1 of 3. Overrides 30 §4.2's PH3 (51 Q8)"
+
+[[capability]]
+id        = "fracture.fractal_domain_discovery"
+name      = "fractal-domain-discovery"
+phase     = "PH5"
+owner     = "41 §5.3"
+kind      = "crate"
+notes     = "[crate]. Overrides 41 §5.3's PH2"
+
+[[capability]]
+id        = "fracture.cross_society_search_served_by_s15"
+name      = "Cross-Society search served by S15 Atlas"
+phase     = "PH5"
+owner     = "10 §3"
+kind      = "feature"
+notes     = "§3.9. Index-only, never authoritative"
+
+[[capability]]
+id        = "fracture.atlas_extracted_as_a_service"
+name      = "Atlas extracted as a service"
+phase     = "PH5"
+owner     = "10 §2 ⑥"
+kind      = "service"
+consumes  = { services = 1 }
+notes     = "[svc] 1 of 2. PH4 has no free service slot"
+
+[[capability]]
+id        = "fracture.seasons_infrastructure_additive_only_content_objectives"
+name      = "Seasons infrastructure: additive-only content, objectives, themed Facets"
+phase     = "PH5"
+owner     = "18 §8"
+milestone = "M5.10"
+kind      = "feature"
+notes     = "M5.10. 50 PH5's designated cut candidate"
+
+[[capability]]
+id        = "fracture.s4_content_creation"
+name      = "S4 — Content Creation"
+phase     = "PH5"
+owner     = "17 §3.2"
+kind      = "source"
+consumes  = { sources = 1 }
+notes     = "[src] 1 of 2. Overrides 17 §3.2's PH2 — 50 PH2 budgets zero Sources"
+
+[[capability]]
+id        = "fracture.s6_moderation_work"
+name      = "S6 — Moderation Work"
+phase     = "PH5"
+owner     = "17 §3.2"
+kind      = "source"
+consumes  = { sources = 1 }
+notes     = "[src] 2 of 2. Needs PH3's moderation and appeal pipeline plus two phases of Standing data"
+
+[[capability]]
+id        = "fracture.sinks_k15_dormant_treasury_reclamation"
+name      = "Sinks K15 (dormant Treasury reclamation)"
+phase     = "PH5"
+owner     = "17 §4"
+kind      = "sink"
+notes     = "[snk]"
+
+[[capability]]
+id        = "fracture.global_registry_hash_partitioned_by_fnid"
+name      = "Global Registry hash-partitioned by FNID prefix"
+phase     = "PH5"
+owner     = "60 §4 row 1"
+kind      = "feature"
+notes     = "It has no ordering requirement, so unlike the log it is genuinely partitionable"
+
+# -- PH6 ------------------------------------------------------------------------
+
+[[capability]]
+id        = "market.category_taxonomy_listing_model_capability_manifest"
+name      = "Category taxonomy, listing model, capability manifest shown pre-purchase, curated shelves"
+phase     = "PH6"
+owner     = "19 §2–§3"
+milestone = "M6.1"
+kind      = "feature"
+notes     = "M6.1. Overrides 19 §17's \"4–5\" (§3.18)"
+
+[[capability]]
+id        = "market.transparent_sort_and_the_allowed_signal"
+name      = "Transparent sort and the allowed-signal audit"
+phase     = "PH6"
+owner     = "19 §8"
+milestone = "M6.1"
+kind      = "feature"
+notes     = "M6.1"
+
+[[capability]]
+id        = "market.free_third_party_extensions"
+name      = "Free third-party Extensions"
+phase     = "PH6"
+owner     = "19 §17, 02 §3"
+kind      = "feature"
+notes     = "Overrides 19 §17. 02 §3 requires two phases of adversarial exposure after the PH3 audit"
+
+[[capability]]
+id        = "market.purchase_saga_licences_refunds_escrow_for"
+name      = "Purchase saga, licences, refunds, escrow for services, disputes"
+phase     = "PH6"
+owner     = "19 §5"
+milestone = "M6.2"
+kind      = "feature"
+notes     = "M6.2"
+
+[[capability]]
+id        = "market.revenue_share_12_platform_fee_70"
+name      = "Revenue share: 12% platform fee, 70% creator floor"
+phase     = "PH6"
+owner     = "19 §6.1"
+kind      = "feature"
+notes     = "Ruling §3.19. 17 K7's 5% is regenerated from 19 §6.1"
+
+[[capability]]
+id        = "market.payouts_settlement_cadence_holdback"
+name      = "Payouts, settlement cadence, holdback"
+phase     = "PH6"
+owner     = "19 §7"
+milestone = "M6.3"
+kind      = "feature"
+notes     = "M6.3. Counsel review required before ship"
+
+[[capability]]
+id        = "market.review_pipeline_r0r3_human_review_tiers"
+name      = "Review pipeline R0–R3, human review tiers, fast path, recall with signed orders and TTL attestations"
+phase     = "PH6"
+owner     = "19 §10"
+milestone = "M6.4"
+kind      = "feature"
+notes     = "M6.4"
+
+[[capability]]
+id        = "market.review_pipeline_service"
+name      = "Review pipeline service"
+phase     = "PH6"
+owner     = "10 §2"
+kind      = "service"
+consumes  = { services = 1 }
+notes     = "[svc] 1 of 2"
+
+[[capability]]
+id        = "market.ratings_and_reviews_purchaser_only_trust"
+name      = "Ratings and reviews: purchaser-only, Trust-weighted, creator response, brigading defence"
+phase     = "PH6"
+owner     = "19 §9"
+milestone = "M6.5"
+kind      = "feature"
+notes     = "M6.5"
+
+[[capability]]
+id        = "market.creator_portal_sandbox_societies_privacy_respecting"
+name      = "Creator portal: sandbox Societies, privacy-respecting analytics, fn ext publish, capability diff audit"
+phase     = "PH6"
+owner     = "19 §11"
+milestone = "M6.6"
+kind      = "feature"
+notes     = "M6.6"
+
+[[capability]]
+id        = "market.society_storefronts_and_shelf_fees"
+name      = "Society storefronts and Shelf fees"
+phase     = "PH6"
+owner     = "19 §12"
+milestone = "M6.7"
+kind      = "feature"
+notes     = "M6.7"
+
+[[capability]]
+id        = "market.federation_shared_discovery_capability_sharing_joint"
+name      = "Federation: shared discovery, capability sharing, joint treasuries"
+phase     = "PH6"
+owner     = "11 §2, 50 M6.8"
+milestone = "M6.8"
+kind      = "feature"
+notes     = "M6.8. Society family; no new API family"
+
+[[capability]]
+id        = "market.self_hosted_nodes_joining_the_fractal"
+name      = "Self-hosted Nodes joining the Fractal Net"
+phase     = "PH6"
+owner     = "10 §9"
+milestone = "M6.9"
+kind      = "feature"
+notes     = "M6.9"
+
+[[capability]]
+id        = "market.seasons_v1_with_graceful_end_mechanics"
+name      = "Seasons v1 with graceful-end mechanics"
+phase     = "PH6"
+owner     = "18 §8.4"
+milestone = "M6.10"
+kind      = "feature"
+notes     = "M6.10"
+
+[[capability]]
+id        = "market.listings_purchases_payouts_the_market_family"
+name      = "listings/purchases/payouts — the Market family"
+phase     = "PH6"
+owner     = "30 §4.2"
+kind      = "api_family"
+consumes  = { api_families = 1 }
+notes     = "[api] 1 of 3"
+
+[[capability]]
+id        = "market.fractal_domain_market"
+name      = "fractal-domain-market"
+phase     = "PH6"
+owner     = "41 §5.3"
+kind      = "crate"
+notes     = "[crate]"
+
+[[capability]]
+id        = "market.s5_curation"
+name      = "S5 — Curation"
+phase     = "PH6"
+owner     = "17 §3.2"
+kind      = "source"
+consumes  = { sources = 1 }
+notes     = "[src] 1 of 2. Matches 50 PH6's \"curation\""
+
+[[capability]]
+id        = "market.s9_extension_development"
+name      = "S9 — Extension Development"
+phase     = "PH6"
+owner     = "17 §3.2"
+kind      = "source"
+consumes  = { sources = 1 }
+notes     = "[src] 2 of 2. Matches 50 PH6's \"extension development\""
+
+[[capability]]
+id        = "market.sinks_k7_marketplace_fee_k17_listing"
+name      = "Sinks K7 (marketplace fee), K17 (listing bond)"
+phase     = "PH6"
+owner     = "17 §4, 19 §6.2"
+kind      = "sink"
+notes     = "[snk]"
+
+[[capability]]
+id        = "market.attested_oracle_facet_evolution_composition_licensing"
+name      = "Attested (oracle) Facet evolution, composition, licensing, royalties, escrow"
+phase     = "PH6"
+owner     = "16 §20"
+kind      = "feature"
+notes     = "Needs a Trust baseline for attesters"
+
+[[capability]]
+id        = "market.extension_ui_escape_hatch_decision_host"
+name      = "Extension UI escape hatch decision (host-owned input-mediated canvas, or rewrite 19 §1/19 §14)"
+phase     = "PH6"
+owner     = "20 §7"
+kind      = "feature"
+notes     = "Open decision D-5. Decide before the gate, not at it"
+
+# -- PH7 ------------------------------------------------------------------------
+
+[[capability]]
+id        = "experience.experience_sandbox_hardening_beyond_the_plugin"
+name      = "Experience sandbox hardening beyond the plugin model"
+phase     = "PH7"
+owner     = "20 §12"
+kind      = "feature"
+notes     = "Gated on zero sandbox escapes in two phases"
+
+[[capability]]
+id        = "experience.authoritative_state_and_tick_model_client"
+name      = "Authoritative state and tick model, client prediction, session lifecycle"
+phase     = "PH7"
+owner     = "20 §12"
+kind      = "feature"
+
+[[capability]]
+id        = "experience.vault_backed_asset_delivery_for_experiences"
+name      = "Vault-backed asset delivery for Experiences"
+phase     = "PH7"
+owner     = "20 §12"
+kind      = "feature"
+
+[[capability]]
+id        = "experience.in_experience_economy_with_hard_caps"
+name      = "In-Experience economy with hard caps (may charge FRC; may never emit FRC, XP, Trust or Standing)"
+phase     = "PH7"
+owner     = "20 §12"
+kind      = "feature"
+notes     = "Property-tested"
+
+[[capability]]
+id        = "experience.experience_chambers_engine_plug_in_interface"
+name      = "Experience Chambers, engine plug-in interface, creator tooling"
+phase     = "PH7"
+owner     = "20 §12"
+kind      = "feature"
+
+[[capability]]
+id        = "experience.two_first_party_experiences"
+name      = "Two first-party Experiences"
+phase     = "PH7"
+owner     = "50 PH7"
+kind      = "feature"
+notes     = "Reduced from three — the 02 §8 trade that pays for the two Sources below"
+
+[[capability]]
+id        = "experience.extension_kind_experience"
+name      = "Extension kind experience"
+phase     = "PH7"
+owner     = "20 §2"
+kind      = "feature"
+
+[[capability]]
+id        = "experience.experience_host_service"
+name      = "Experience host service"
+phase     = "PH7"
+owner     = "10 §2"
+kind      = "service"
+consumes  = { services = 1 }
+notes     = "[svc] 1 of 2"
+
+[[capability]]
+id        = "experience.s3_compute_contribution"
+name      = "S3 — Compute Contribution"
+phase     = "PH7"
+owner     = "17 §3.2"
+kind      = "source"
+consumes  = { sources = 1 }
+notes     = "[src] 1 of 2. [overrides 50] — 50 PH7 budgets zero Sources. Open decision D-3"
+
+[[capability]]
+id        = "experience.s8_agent_development"
+name      = "S8 — Agent Development"
+phase     = "PH7"
+owner     = "17 §3.2"
+kind      = "source"
+consumes  = { sources = 1 }
+notes     = "[src] 2 of 2. [overrides 50]. Needs two phases of PH3 agent telemetry"
+
+# -- PH8 ------------------------------------------------------------------------
+
+[[capability]]
+id        = "chain.consensus_and_finality_selection_with_an"
+name      = "Consensus and finality selection with an ADR"
+phase     = "PH8"
+owner     = "16 §7"
+kind      = "feature"
+notes     = "Entry criterion: a specific articulated reason the internal ledger is insufficient"
+
+[[capability]]
+id        = "chain.ledger_implementation_behind_the_unchanged_trait"
+name      = "Ledger implementation behind the unchanged trait"
+phase     = "PH8"
+owner     = "16 §7"
+kind      = "feature"
+notes     = "The P11 proof"
+
+[[capability]]
+id        = "chain.anchoring_migration_from_internal_to_chain"
+name      = "Anchoring migration from internal to chain; the five-stage migration with shadow phase"
+phase     = "PH8"
+owner     = "16 §7"
+kind      = "feature"
+notes     = "30 days zero divergence; 90-day inverted dual-write rollback"
+
+[[capability]]
+id        = "chain.external_chain_adapters_as_read_only"
+name      = "External Chain adapters as read-only projections; public verification tool"
+phase     = "PH8"
+owner     = "16 §8"
+kind      = "feature"
+
+[[capability]]
+id        = "chain.bridges_to_external_chains"
+name      = "Bridges to external chains"
+phase     = "PH8"
+owner     = "16 §8"
+kind      = "feature"
+notes     = "ADR required; 02 §3"
+
+[[capability]]
+id        = "chain.s7_governance_participation"
+name      = "S7 — Governance Participation"
+phase     = "PH8"
+owner     = "17 §3.2"
+kind      = "source"
+consumes  = { sources = 1 }
+notes     = "[src] 1 of 2. Open decision D-3"
+
+[[capability]]
+id        = "chain.s10_onboarding_vouching"
+name      = "S10 — Onboarding & Vouching"
+phase     = "PH8"
+owner     = "17 §3.2"
+kind      = "source"
+consumes  = { sources = 1 }
+notes     = "[src] 2 of 2. The highest-Sybil-risk Source; last for that reason. Open decision D-4"
+
+# -- PH9 ------------------------------------------------------------------------
+
+[[capability]]
+id        = "exchange.fiat_rail_external_frc_exchangeability_off"
+name      = "Fiat Rail, external FRC exchangeability, off-ramp for payouts"
+phase     = "PH9"
+owner     = "17 §14"
+kind      = "feature"
+notes     = "Counsel-gated. May never open"
