@@ -40,6 +40,12 @@ jobs:
           toolchain: "1.98.1"
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+      # The criterion-5 test drives the REAL apps/web/app.js under Node, so
+      # Node is a test dependency, not a convenience. Hosted runners ship one
+      # already; pinning it means the web surface is exercised against a known
+      # runtime rather than whatever the image happened to bake in this month.
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
       # bash on every runner: PowerShell is the Windows default and stops on
       # different things. One shell means one failure mode to reason about.
       - name: format
