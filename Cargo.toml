@@ -22,7 +22,7 @@ version      = "0.0.1"
 edition      = "2021"
 rust-version = "1.98"
 license      = "LicenseRef-Fractal-Node-Placeholder"
-repository   = "https://github.com/fractalnode/fractal-node"
+repository   = "https://github.com/ALaustrup/fractal-node"
 # Not publishable, and saying so is not a formality. These are internal members
 # of one application, not libraries anyone should take a dependency on: the
 # layering in layers.toml is only meaningful inside this workspace, and the
