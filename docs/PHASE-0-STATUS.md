@@ -11,7 +11,7 @@
 | 2 | Core compiles to x86_64, aarch64, wasm32 | **Met** | All three built from a clean export with the CI job's exact command and crate list: x86_64 30s, aarch64 3s (gcc-aarch64-linux-gnu), wasm32 21s. |
 | 3 | Regenerating from `fractal-schema` produces a zero diff | **Met** | `cargo xtask codegen --check`: 6 artefacts, 0 drift. |
 | 4 | Regenerating tokens produces a zero diff across five targets | **Met** | `cargo xtask tokens --check` |
-| 5 | Creating a Society via web, CLI and API produces identical event streams | **Partial** | Verified by hand, and all three now share one generated client/table. Still not a test. |
+| 5 | Creating a Society via web, CLI and API produces identical event streams | **Met** | `crates/bin/cli/tests/surface_equivalence.rs`. Three independent Nodes, one per surface; the web leg executes `apps/web/app.js` unmodified under Node.js. Logs normalised for ids and clocks, then compared exactly. Found a real P13 divergence on untidy input — see below. |
 | 6 | Simulation runs 2,000 seeded histories asserting three invariants | **Met** | `cargo xtask sim`: 2,000 × 40 = 80,000 operations, 0 violations. Asserts five properties, not three. |
 | 7 | Fast-lane CI completes under 5 minutes | **Partial** | The eight fast-lane steps run green in **66s** on a cold target directory, measured on a Linux host. A hosted runner adds checkout, toolchain install and cache restore, so the real number will be higher — but not by four minutes. Unverified on a real runner, and unmeasured on Windows and macOS, which are usually the slow ones. |
 
@@ -19,7 +19,7 @@
 
 - 14-crate Rust workspace, layered, with the dependency direction enforced by
   `cargo xtask lint-deps` (14 crates, 0 violations).
-- 56 tests passing. The load-bearing ones: a Level 0 Citizen can found their
+- 60 tests passing. The load-bearing ones: a Level 0 Citizen can found their
   first Society; an Agent cannot found one; a retried command creates one
   Society rather than two; replayed state equals the projection.
 - Two `EventStore` implementations under a behavioural equivalence test
@@ -95,6 +95,35 @@ Adding an operation to the contract and not implementing it in the CLI passes
 generator put it there. `crates/bin/cli/tests/reachable.rs` walks the real
 argument parser and catches it. Both were verified by deliberately breaking
 them; a gate that has never failed is a gate nobody has tested.
+
+## Note on what criterion 5 found when it stopped being a memory
+
+"Verified by hand" survived the whole of Phase 0. Making it a test took an
+afternoon and found two things, neither of which hand-verification could have.
+
+**A real P13 divergence.** Given `"  FirstHearth  "` — whitespace, the most
+ordinary input defect there is — the web GUI founded a Society and the CLI and
+the API both refused it with `invalid_handle`. The GUI trimmed before sending;
+nothing else did. Same intent, three answers. `Handle::parse` already strips a
+leading `@` and lowercases, so normalisation was always its job; whitespace had
+simply drifted out to one front end. Trimming moved into the parser and the
+`.trim()` calls came out of `app.js`. Normalisation performed by a caller is
+normalisation each caller can get differently.
+
+Note which test caught it: the first version used clean inputs and passed while
+the divergence was live. Tidy fixtures test the path where surfaces already
+agree.
+
+**A test that was lying.** The first version passed a deliberately injected
+domain bug with four green ticks. `CARGO_BIN_EXE_` covers only the package
+under test, and cargo rebuilds only what that package needs — so
+`cargo test -p fractal-cli` left `fractal-node` exactly as it was, and the
+Runtime under test had been compiled before the bug existed. The test now
+builds the Runtime it drives. A test that silently exercises a stale artefact
+is worse than no test: it reports on a build nobody has any more.
+
+Both were caught the same way as everything else this week — by trying to break
+the thing on purpose and being surprised when nothing broke.
 
 ## Note on the Windows leg, before it has run
 

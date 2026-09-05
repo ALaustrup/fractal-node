@@ -320,9 +320,24 @@ impl Handle {
     pub const MIN: usize = 3;
     pub const MAX: usize = 24;
 
+    /// Parse and NORMALISE a Handle.
+    ///
+    /// Normalisation lives here and nowhere else. This function already strips
+    /// a leading `@` and lowercases, so surrounding whitespace belongs to the
+    /// same job — it is a typing artefact, never part of an identifier, and the
+    /// domain already trims a Society's name for exactly this reason.
+    ///
+    /// It is here rather than in the front ends because that is where it had
+    /// drifted to: the web GUI trimmed before sending and the CLI and the API
+    /// did not, so `"  firsthearth  "` founded a Society from the browser and
+    /// was refused everywhere else. Same intent, three answers — a P13
+    /// violation, found by the criterion-5 equivalence test. Normalisation
+    /// performed by a caller is normalisation each caller can get differently.
+    ///
     /// # Errors
     /// Returns [`HandleError`] when the input is the wrong length or shape.
     pub fn parse(raw: &str) -> Result<Self, HandleError> {
+        let raw = raw.trim();
         let s = raw.strip_prefix('@').unwrap_or(raw).to_ascii_lowercase();
         let len = s.chars().count();
         if !(Self::MIN..=Self::MAX).contains(&len) {

@@ -130,8 +130,11 @@ $('form').addEventListener('submit', async (e) => {
   btn.disabled = true;
   try {
     await api.societyCreate({
-      name: $('name').value.trim(),
-      handle: $('handle').value.trim(),
+      // Sent RAW. Trimming here is normalisation, normalisation is the
+      // contract's job, and doing it in one front end is how this surface
+      // came to accept a handle the CLI and the API both refused.
+      name: $('name').value,
+      handle: $('handle').value,
       visibility: new FormData(e.target).get('visibility'),
       // Makes the command safe to retry — the same key the CLI sends.
       idempotency_key: `web-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
